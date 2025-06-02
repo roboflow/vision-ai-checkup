@@ -54,7 +54,7 @@
                 <li><a class="link" href="/">Leaderboard</a></li>
                 <li><a class="link" href="/prompts">Prompts</a></li>
                 <li><a class="link" href="/#about">About</a></li>
-                <li><a class="btn-sm" href="https://github.com/roboflow/vision-ai-checkup/issues/new?template=prompt.yml">Add a Prompt</a></li>
+                <li><a class="btn-primary" href="https://github.com/roboflow/vision-ai-checkup/issues/new?template=prompt.yml">Add a Prompt</a></li>
             </ul>
 
             <!-- Mobile Navigation Button -->
@@ -75,7 +75,6 @@
         <div class="flex flex-col h-full">
             <div class="flex justify-between items-center h-16 min-h-16 px-4 py-2 bg-zinc-50/10">
                 <a class="flex items-center gap-2" href="/">
-                    <!-- <img src="/images/svg/logo-glasses.svg" alt="Vision AI Checkup" class="w-6" /> -->
                     <img src="/images/svg/logo-vision-ai-checkup.svg" alt="Vision AI Checkup" class="w-6 h-6" />
                     <p>Vision AI Checkup</p>
                 </a>
@@ -101,11 +100,6 @@
     </div>
 
     <div class="bkg-img">
-        <!-- <img src="/images/img-eyechart-rf.png" alt="eye chart" class="bkg-img-eyechart-rf">
-        <img src="/images/img-glasses.png" alt="glasses" class="bkg-img-glasses">
-        <img src="/images/img-clipboard.png" alt="clipboard" class="bkg-img-clipboard-rx">
-        <img src="/images/img-contact-lense-case.png" alt="contact lense case" class="bkg-img-contact-lense-case"> -->
-
         <img src="/images/svg/adjustable-glasses.svg" alt="adjustable glasses illustration" class="bkg-img-adjustable-glasses">
         <img src="/images/svg/eye-chart.svg" alt="eye chart illustration" class="bkg-img-eye-chart">
         <img src="/images/svg/clipboard.svg" alt="clipboard illustration" class="bkg-img-clipboard">
@@ -130,59 +124,7 @@
             // Only play animation if not already played in this session
             if (!sessionStorage.getItem('bkgAnimationPlayed')) {
                 const duration = 1;
-                // gsap.fromTo(".bkg-img-eyechart-rf", {
-                //     x: '-30rem',
-                //     y: '-30rem',
-                //     opacity: 0,
-                //     filter: 'blur(20px)',
-                //     ease: "power2.inOut"
-                // }, {
-                //     x: '0rem',
-                //     y: '0rem',
-                //     opacity: 1,
-                //     filter: 'blur(0px)',
-                //     duration: duration,
-                // });
-                // gsap.fromTo(".bkg-img-glasses", {
-                //     x: '10rem',
-                //     y: '10rem',
-                //     opacity: 0,
-                //     filter: 'blur(20px)',
-                //     ease: "power2.inOut"
-                // }, {
-                //     x: '0rem',
-                //     y: '0rem',
-                //     opacity: 1,
-                //     filter: 'blur(0px)',
-                //     duration: duration,
-                // });
-                // gsap.fromTo(".bkg-img-clipboard-rx", {
-                //     x: '-30rem',
-                //     y: '30rem',
-                //     duration: 1,
-                //     opacity: 0,
-                //     filter: 'blur(20px)',
-                //     ease: "power2.inOut"
-                // }, {
-                //     x: '0rem',
-                //     y: '0rem',
-                //     opacity: 1,
-                //     filter: 'blur(0px)',
-                //     duration: duration,
-                // });
-                // gsap.fromTo(".bkg-img-contact-lense-case", {
-                //     x: '12rem',
-                //     y: '-12rem',
-                //     opacity: 0,
-                //     filter: 'blur(20px)',
-                //     ease: "power2.inOut"
-                // }, {
-                //     x: '0rem',
-                //     y: '0rem',
-                //     opacity: 1,
-                //     filter: 'blur(0px)',
-                //     duration: duration,
-                // });
+
                 gsap.fromTo(".bkg-img-adjustable-glasses", {
                     x: '-30rem',
                     y: '-30rem',
