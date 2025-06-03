@@ -94,8 +94,8 @@
         <h2 id="prompts-heading" class="h2 mb-3 md:mt-[60px]">All Prompts</h2>
         <div class="flex flex-col gap-2">
             {% for assessment in results %}
-                <details class="card cursor-pointer group" {% if loop.index == 1 %}open{% endif %} data-category="{{ assessment['category'] }}">
-                    <summary id="{{ assessment['assessment_name'] }}" class="flex justify-between items-center">
+                <details class="card !p-0 cursor-pointer group" {% if loop.index == 1 %}open{% endif %} data-category="{{ assessment['category'] }}">
+                    <summary id="{{ assessment['assessment_name'] }}" class="flex justify-between items-center p-4">
                         <div class="flex items-center gap-2">
                             {% if assessment['correct'] %}
                                 <svg class="w-6 h-6 text-emerald-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256"><rect width="256" height="256" fill="none"/><polyline points="88 136 112 160 168 104" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="16"/><circle cx="128" cy="128" r="96" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="16"/></svg>
@@ -108,7 +108,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                         </svg>
                     </summary>
-                    <div class="flex flex-col gap-4 mt-4">
+                    <div class="flex flex-col gap-4 px-4 pb-4">
                         <img class="w-full h-auto rounded-lg" src="/images/compressed/{{ assessment['file_name'].replace(".png", ".jpeg") }}" alt="">
                         <div class="rich-text">
                             <div><b>Submitted by</b>: <a href="{{ assessment['submitted_by_link'] }}">{{ assessment['submitted_by'] }}</a></div>

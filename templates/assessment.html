@@ -32,8 +32,8 @@
         <h2 class="h2 mb-3 md:mt-[33px]">How models perform on this prompt</h2>
         <div class="flex flex-col gap-2">
             {% for item in model_results %}
-                <details class="card cursor-pointer group">
-                    <summary {% if loop.index == 1 %}open{% endif %} class="flex justify-between items-center">
+                <details class="card !p-0 cursor-pointer group">
+                    <summary {% if loop.index == 1 %}open{% endif %} class="flex justify-between items-center p-4">
 
                         <div class="flex items-center gap-2">
                             {% if item['correct'] %}
@@ -47,7 +47,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                         </svg>
                     </summary>
-                    <div class="flex flex-col gap-4">
+                    <div class="flex flex-col gap-4 px-4 pb-4 -mt-4">
                         <div class="rich-text">
                             <p>Model answer: {{ item["result"] }}</p>
                             <p><a href="/{{ item['model_name'].replace(' ', '-').lower().replace('.', '-') }}/">View more tests run on this model</a></p>

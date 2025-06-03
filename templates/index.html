@@ -23,16 +23,16 @@
             Run on {{ assessment_count }} prompts.
         </div>
         <div role="table" class="w-full bg-white rounded-lg overflow-hidden overflow-x-auto shadow-sm text-sm mb-3">
-            <div role="row" class="flex flex-nowrap min-w-80 gap-4 font-medium px-4 py-2 text-zinc-900">
+            <div role="row" class="flex flex-nowrap min-w-[500px] gap-4 font-medium px-4 py-2 text-zinc-900">
                 <div class="flex-1">Model</div>
-                <div class="w-14">Score</div>
-                <div class="w-14">Time</div>
+                <div class="w-14 text-center">Score</div>
+                <div class="w-32 text-center" title="Average Model Response Time per Prompt">Avg Time / Prompt</div>
             </div>
             {% for model in model_results %}
                 <a role="row" class="model-row {% if loop.index > 10 %}hidden{% endif %}" href="/{{ model["model_name"].replace(' ', '-').lower().replace('.', '-') }}/">
                     <div class="flex flex-nowrap items-center flex-1 gap-1 whitespace-nowrap text-violet-700">#{{ model["position"] }} <img src="{{ model['logo'] }}" class="w-4 h-4"> {{ model["model_name"] }}</div>
-                    <div class="w-14">{{ model["percentage"] }}%</div>
-                    <div class="w-14">
+                    <div class="w-14 text-center">{{ model["percentage"] }}%</div>
+                    <div class="w-32 text-center">
                         {% if not category %}
                         {{ model["average_time"] }}
                         {% endif %}

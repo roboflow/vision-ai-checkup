@@ -35,7 +35,7 @@
 }
 
 .model-row {
-  @apply flex flex-nowrap min-w-80 gap-4 px-4 py-2 border-t border-zinc-200 text-zinc-600 hover:bg-zinc-50;
+  @apply flex flex-nowrap min-w-[500px] gap-4 px-4 py-2 border-t border-zinc-200 text-zinc-600 hover:bg-zinc-50;
 }
 
 .model-row.hidden {
