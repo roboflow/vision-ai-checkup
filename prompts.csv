@@ -96,3 +96,4 @@ diameter_part.png,Please check and measure the inner diameter and outer diameter
 7-cube_t0.png,How many vertices (marked as red or orange dots) are visible in this diagram? Present your answer as an integer, like 1.,127,Counting nodes,Object Counting,User,https://en.wikipedia.org/wiki/File:7-cube_t0.svg
 music.png,Who transcribed this sheet music, according to the document? Answer as only the name is presented on the document.,Otto Singer II,Find an author,Document Understanding,User,
 transcript.png,Find the total credits in fall 2015/16 in the attached school transcript,12,Total Credits in Fall 2015,Document Understanding,Jayesh,https://github.com/jayeshvpatil
+package_pallet.png,How many packages are on this pallet?,2,Count number of packages on a pallet,Object Counting,Aashish Anand,https://github.com/AshAnand34
