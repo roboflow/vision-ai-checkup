@@ -124,6 +124,7 @@ def main():
         return value
 
     logos = {
+        "DeepSeek R1": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcREUufvK7RFFGsbQTZQq9BZgFASSDa7xOTb1A&s",
         "Llama 3 11B Vision": "https://signsalad.com/wp-content/uploads/2021/11/Screenshot-2021-11-03-at-12.14.11.png",
         "Llama 3 70B": "https://signsalad.com/wp-content/uploads/2021/11/Screenshot-2021-11-03-at-12.14.11.png",
         "Llama 4 Maverick 17B": "https://signsalad.com/wp-content/uploads/2021/11/Screenshot-2021-11-03-at-12.14.11.png",
@@ -279,7 +280,6 @@ def main():
             "OpenAI O3": OpenAIModel(model_id="o3"),
             "GPT-4.1": OpenAIModel(model_id="gpt-4.1"),
             "ChatGPT-4o": OpenAIModel(model_id="chatgpt-4o-latest"),
-            # "OpenAI O3": OpenAIModel(model_id="o3"),
             "GPT-4.1 Mini": OpenAIModel(model_id="gpt-4.1-mini"),
             "GPT-4.1 Nano": OpenAIModel(model_id="gpt-4.1-nano"),
             "OpenAI O1": OpenAIModel(model_id="o1"),
@@ -304,6 +304,11 @@ def main():
             "Gemini 2.5 Flash Preview": GeminiModel(model_id="gemini-2.5-flash-preview-04-17"),
             "Cohere Aya Vision 8B": CohereModel(model_id="c4ai-aya-vision-8b"),
             "Cohere Aya Vision 32B": CohereModel(model_id="c4ai-aya-vision-32b"),
+            "DeepSeek R1": CustomOpenAIModel(
+                model_id="deepseek-ai/DeepSeek-R1",
+                base_url="https://router.huggingface.co/hyperbolic/v1",
+                api_key=os.environ.get("HUGGINGFACE_API_KEY"),
+            ),
             "Qwen 2.5 VL 7B": CustomOpenAIModel(
                 model_id="Qwen/Qwen2.5-VL-7B-Instruct",
                 base_url="https://router.huggingface.co/hyperbolic/v1",
