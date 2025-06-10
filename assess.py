@@ -67,7 +67,6 @@ open_or_closed_source = {
     "Cohere Aya Vision 8B": "closed",
     "Cohere Aya Vision 32B": "closed",
     "Qwen 2.5 VL 7B": "open",
-    "Mistral Small 3.1 24b": "open",
     "Llama 4 Scout 17B": "closed",
     "Llama 3 11B Vision": "closed",
     "Gemma 3 27b": "closed",
@@ -76,6 +75,11 @@ open_or_closed_source = {
     "Mistral Small 3.1 24B": "open",
     "Gemma 3 4B": "open",
     "Phi 4 Multimodal": "closed",
+    "Gemini 1.5 Flash": "closed",
+    "Gemini 1.5 Pro": "closed",
+    "Llama 4 Maverick 17B": "closed",
+    "Claude 4 Opus": "closed",
+    "OpenAI O3": "closed",
 }
 
 def main():
@@ -111,7 +115,6 @@ def main():
         "ChatGPT-4o": "https://openai.com/favicon.ico",
         "OpenAI O1 Pro": "https://openai.com/favicon.ico",
         "GPT-4.1 Mini": "https://openai.com/favicon.ico",
-        "Mistral Small 3.1 24b": "https://cdn-avatars.huggingface.co/v1/production/uploads/62dac1c7a8ead43d20e3e17a/wrLf5yaGC6ng4XME70w6Z.png",
         "GPT-4.1 Nano": "https://openai.com/favicon.ico",
         "OpenAI O3": "https://openai.com/favicon.ico",
         "OpenAI O3 Mini": "https://openai.com/favicon.ico",
@@ -130,11 +133,15 @@ def main():
         "Claude 4 Sonnet": "https://www.anthropic.com/favicon.ico",
         "Claude 4 Opus": "https://www.anthropic.com/favicon.ico",
         "Gemma 3n 4B": "https://www.google.com/favicon.ico",
-        "Mistral Medium 3": "https://openrouter.ai/favicon.ico",
+        "Mistral Medium 3": "https://mistral.ai/favicon.ico",
         "Gemma 3 1B": "https://mistral.ai/favicon.ico",
+        "Mistral Small 3.1 24b": "https://mistral.ai/favicon.ico",
         "Mistral Small 3.1 24B": "https://mistral.ai/favicon.ico",
         "Gemma 3 4B": "https://www.google.com/favicon.ico",
-        "Phi 4 Multimodal": "https://microsoft.com/favicon.ico",
+        "Gemini 1.5 Flash": "https://www.google.com/favicon.ico",
+        "Gemini 1.5 Pro": "https://www.google.com/favicon.ico",
+        "Arcee.ai Spotlight": "https://cdn.prod.website-files.com/6781a10424493fe352bc6cb5/678e92cb5d392e76c953e690_Favicon.png",
+        "Phi 4 Multimodal": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/Microsoft_logo.svg/1024px-Microsoft_logo.svg.png?20210729021049",
     }
 
     def normalise_output(output):
@@ -156,6 +163,7 @@ def main():
     assessments_by_model = defaultdict(lambda: defaultdict(list))
 
     def run_model_with_prompt(model_name, model, assessment):
+        print(model_name, assessment)
         if isinstance(assessment, str):
             # get assessment by file name
             assessment = [a for a in assessments if a["file_name"] == assessment][0]
@@ -231,6 +239,9 @@ def main():
             "Mistral Small 3.1 24B": "",
             "Gemma 3 4B": "",
             "Phi 4 Multimodal": "",
+            "Gemini 1.5 Flash": "",
+            "Gemini 1.5 Pro": "",
+            "Arcee.ai Spotlight": "",
         }
         # load from saved_results
         assessments_by_model = final_results["assessments_by_model"]
@@ -248,6 +259,7 @@ def main():
             "Claude 4 Sonnet": AnthropicModel(model_id="claude-sonnet-4-20250514"),
             "Claude 4 Opus": AnthropicModel(model_id="claude-opus-4-20250514"),
             "OpenAI O4 Mini": OpenAIModel(model_id="o4-mini"),
+            "OpenAI O3": OpenAIModel(model_id="o3"),
             "GPT-4.1": OpenAIModel(model_id="gpt-4.1"),
             "ChatGPT-4o": OpenAIModel(model_id="chatgpt-4o-latest"),
             # "OpenAI O3": OpenAIModel(model_id="o3"),
@@ -260,11 +272,6 @@ def main():
                 base_url="https://router.huggingface.co/nebius/v1",
                 api_key=os.environ.get("HUGGINGFACE_API_KEY"),
             ),
-            "Mistral Small 3.1 24b": CustomOpenAIModel(
-                model_id="mistralai/Mistral-Small-3.1-24B-Instruct-2503",
-                base_url="https://router.huggingface.co/nebius/v1",
-                api_key=os.environ.get("HUGGINGFACE_API_KEY"),
-            ),
             "Llama 4 Scout 17B": CustomOpenAIModel(
                 model_id="meta-llama/Llama-4-Scout-17B-16E-Instruct",
                 base_url="https://router.huggingface.co/together/v1",
@@ -273,6 +280,8 @@ def main():
             "Claude 3.7 Sonnet": AnthropicModel(model_id="claude-3-7-sonnet-20250219"),
             "Claude 3.5 Haiku": AnthropicModel(model_id="claude-3-5-haiku-20241022"),
             "Gemini 2.5 Pro Preview": GeminiModel(model_id="gemini-2.5-pro-preview-03-25"),
+            "Gemini 1.5 Flash": GeminiModel(model_id="gemini-1.5-flash"),
+            "Gemini 1.5 Pro": GeminiModel(model_id="gemini-1.5-pro"),
             "Gemini 2.0 Flash": GeminiModel(model_id="gemini-2.0-flash"),
             "Gemini 2.0 Flash Lite": GeminiModel(model_id="gemini-2.0-flash-lite"),
             "Gemini 2.5 Flash Preview": GeminiModel(model_id="gemini-2.5-flash-preview-04-17"),
@@ -305,6 +314,11 @@ def main():
             ),
             "Phi 4 Multimodal": CustomOpenAIModel(
                 model_id="microsoft/phi-4-multimodal-instruct",
+                base_url="https://openrouter.ai/api/v1",
+                api_key=os.environ.get("OPENROUTER_API_KEY"),
+            ),
+            "Arcee.ai Spotlight": CustomOpenAIModel(
+                model_id="arcee-ai/spotlight",
                 base_url="https://openrouter.ai/api/v1",
                 api_key=os.environ.get("OPENROUTER_API_KEY"),
             ),
@@ -357,18 +371,25 @@ def main():
         models_to_run = [
             (model_name, model_class)
             for model_name, model_class in model_providers.items()
-            if images_to_run_by_model[model_name]
+            if len(images_to_run_by_model[model_name]) > 0
         ]
+        print(models_to_run, "models to run")
+
+        # print(images_to_run_by_model["Claude 4 Opus"])
+
+        # print(models_to_run, "d")
+        # print(images_to_run_by_model["Gemini 1.5 Pro"])
+        # exit()§
 
         with concurrent.futures.ThreadPoolExecutor(max_workers=20) as executor:
             futures = [
                 executor.submit(run_model_with_prompt, model_name, model_class, assessment)
-                for assessment in images_to_run_by_model[model_name]
                 for model_name, model_class in models_to_run
+                for assessment in images_to_run_by_model[model_name]
             ]
 
             total_assessments = len(futures)
-
+            print(models_to_run)
             for future in tqdm(
                 concurrent.futures.as_completed(futures),
                 total=total_assessments,
@@ -377,9 +398,9 @@ def main():
                 model_name, assessment, result, answer, time_taken = future.result()
                 print(model_name, assessment["file_name"], result, answer, time_taken)
                 if result is None:
-                    print(
-                        f"Skipping {model_name} for {assessment['file_name']} as no result is returned"
-                    )
+                    # print(
+                    #     f"Skipping {model_name} for {assessment['file_name']} as no result is returned"
+                    # )
                     continue
                 times_by_model[model_name].append(time_taken)
 
@@ -814,7 +835,7 @@ def main():
         # render the compare template with the model data and results
         # if not times, skip
         if not times_by_model.get(model1) or not times_by_model.get(model2):
-            print(f"Skipping comparison for {model1} and {model2} as no results found")
+            # print(f"Skipping comparison for {model1} and {model2} as no results found")
             continue
         compare_output = compare_template.render(
             model1=model1,
