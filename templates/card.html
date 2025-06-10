@@ -27,6 +27,9 @@
                         </div>
                         <img src="/images/svg/stopwatch.svg" alt="Stopwatch" class="h-6 w-6">
                     </div>
+                    {% if model_in_playground %}
+                        <a class="btn-primary" href="https://playground.roboflow.com" style="grid-column: span 2;text-align: center;align-content: center;">Test {{ model_name }} in our Model Playground</a>
+                    {% endif %}
                 </div>
             </section>
 

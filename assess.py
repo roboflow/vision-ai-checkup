@@ -82,6 +82,23 @@ open_or_closed_source = {
     "OpenAI O3": "closed",
 }
 
+models_in_playground = set([
+    "Qwen 2.5 VL 7B",
+    "Claude 4 Sonnet",
+    "Claude 4 Opus",
+    "Claude 3.7 Sonnet",
+    "Claude 3.5 Haiku",
+    "Gemini 2.0 Flash",
+    "Gemini 1.5 Flash",
+    "Gemini 1.5 Pro",
+    "GPT-4.1",
+    "GPT-4.1 Mini",
+    "GPT-4.1 Nano",
+    "ChatGPT-4o",
+    "OpenAI O4 Mini",
+]) 
+
+
 def main():
     os.makedirs(OUTPUT_DIR, exist_ok=True)
     os.makedirs(os.path.join(OUTPUT_DIR, "prompts"), exist_ok=True)
@@ -642,6 +659,7 @@ def main():
                 card_template.render(
                     open_or_closed_source=open_or_closed_source,
                     model_name=model_name,
+                    model_in_playground=model_name in models_in_playground,
                     grid=True,
                     comparisons=[{"slug": f"/compare/{slugify(m1)}-vs-{slugify(m2)}/", "model_name": m2 if m1 == model_name else m1} for m1, m2 in model_combinations if m1 == model_name or m2 == model_name],
                     all_models=list(model_providers.keys()),
