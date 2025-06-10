@@ -15,6 +15,26 @@ from urllib.parse import quote_plus
 from jinja2 import Environment, FileSystemLoader
 from tqdm import tqdm
 from itertools import combinations
+import optparse
+
+is_in_incremental_mode = False
+def parse_args():
+    parser = optparse.OptionParser()
+    parser.add_option(
+        "--incremental",
+        action="store_true",
+        dest="incremental",
+        default=False,
+        help="Run in incremental mode, only updating changed files.",
+    )
+    options, _ = parser.parse_args()
+    return options
+
+options = parse_args()
+
+if options.incremental:
+    is_in_incremental_mode = True
+    print("Running in incremental mode. Only changed files will be updated.")
 
 if os.path.exists("docs"):
     shutil.rmtree("docs")
@@ -27,6 +47,7 @@ from models.cohere import CohereModel
 from models.custom_openai import CustomOpenAIModel
 from models.gemini import GeminiModel
 from models.openai import OpenAIModel
+# from models.open_router import OpenRouterModel
 # from models.roboflow_workflow import RoboflowWorkflow
 # from utils.data_types import BoundingBoxes
 
@@ -50,6 +71,11 @@ open_or_closed_source = {
     "Llama 4 Scout 17B": "closed",
     "Llama 3 11B Vision": "closed",
     "Gemma 3 27b": "closed",
+    "Mistral Medium 3": "open",
+    "Gemma 3 1B": "open",
+    "Mistral Small 3.1 24B": "open",
+    "Gemma 3 4B": "open",
+    "Phi 4 Multimodal": "closed",
 }
 
 def main():
@@ -103,6 +129,12 @@ def main():
         "Cohere Aya Vision 32B": "https://cohere.com/favicon.ico",
         "Claude 4 Sonnet": "https://www.anthropic.com/favicon.ico",
         "Claude 4 Opus": "https://www.anthropic.com/favicon.ico",
+        "Gemma 3n 4B": "https://www.google.com/favicon.ico",
+        "Mistral Medium 3": "https://openrouter.ai/favicon.ico",
+        "Gemma 3 1B": "https://mistral.ai/favicon.ico",
+        "Mistral Small 3.1 24B": "https://mistral.ai/favicon.ico",
+        "Gemma 3 4B": "https://www.google.com/favicon.ico",
+        "Phi 4 Multimodal": "https://microsoft.com/favicon.ico",
     }
 
     def normalise_output(output):
@@ -123,8 +155,11 @@ def main():
 
     assessments_by_model = defaultdict(lambda: defaultdict(list))
 
-
     def run_model_with_prompt(model_name, model, assessment):
+        if isinstance(assessment, str):
+            # get assessment by file name
+            assessment = [a for a in assessments if a["file_name"] == assessment][0]
+
         with open(
             os.path.join(BASE_IMAGE_DIR, assessment["file_name"]), "rb"
         ) as image_file:
@@ -165,9 +200,10 @@ def main():
     times_by_model = defaultdict(list)
 
     # if model_results.json exists, load it instead of running the models again
-    if os.path.exists("./model_results.json"):
+    if os.path.exists("./model_results.json") and not is_in_incremental_mode:
         with open("./model_results.json", "r") as file:
             final_results = orjson.loads(file.read())
+
         model_providers = {
             "OpenAI O4 Mini": "",
             "GPT-4.1": "",
@@ -190,6 +226,11 @@ def main():
             "Gemma 3 27b": "",
             "Claude 4 Sonnet": "",
             "Claude 4 Opus": "",
+            "Mistral Medium 3": "",
+            "Gemma 3 1B": "",
+            "Mistral Small 3.1 24B": "",
+            "Gemma 3 4B": "",
+            "Phi 4 Multimodal": "",
         }
         # load from saved_results
         assessments_by_model = final_results["assessments_by_model"]
@@ -242,13 +283,88 @@ def main():
                 base_url="https://router.huggingface.co/hyperbolic/v1",
                 api_key=os.environ.get("HUGGINGFACE_API_KEY"),
             ),
+            "Mistral Medium 3": CustomOpenAIModel(
+                model_id="mistralai/mistral-medium-3",
+                base_url="https://openrouter.ai/api/v1",
+                api_key=os.environ.get("OPENROUTER_API_KEY"),
+            ),
+            "Mistral Small 3.1 24B": CustomOpenAIModel(
+                model_id="mistralai/mistral-small-3.1-24b-instruct",
+                base_url="https://openrouter.ai/api/v1",
+                api_key=os.environ.get("OPENROUTER_API_KEY"),
+            ),
+            "Llama 4 Maverick 17B": CustomOpenAIModel(
+                model_id="meta-llama/llama-4-maverick",
+                base_url="https://openrouter.ai/api/v1",
+                api_key=os.environ.get("OPENROUTER_API_KEY"),
+            ),
+            "Gemma 3 4B": CustomOpenAIModel(
+                model_id="google/gemma-3-4b-it",
+                base_url="https://openrouter.ai/api/v1",
+                api_key=os.environ.get("OPENROUTER_API_KEY"),
+            ),
+            "Phi 4 Multimodal": CustomOpenAIModel(
+                model_id="microsoft/phi-4-multimodal-instruct",
+                base_url="https://openrouter.ai/api/v1",
+                api_key=os.environ.get("OPENROUTER_API_KEY"),
+            ),
         }
+
+        if is_in_incremental_mode:
+            with open("./model_results.json", "r") as file:
+                final_results = orjson.loads(file.read())
+
+            calculated_models = set(final_results["model_results"].keys())
+            # load from saved_results
+            assessments_by_model = final_results["assessments_by_model"]
+            model_results = final_results["model_results"]
+
+            # assessments = final_results["assessments"]
+
+            assessment_categories = list(set([i["category"] for i in assessments]))
+            assessment_categories.sort()
+            for model_name, results in assessments_by_model.items():
+                for assessment in results.values():
+                    times_by_model[model_name].append(float(assessment["time_taken"].replace("s", "")))
+
+        models_to_run = [(model_name, model_class) for model_name, model_class in model_providers.items()]
+
+        if is_in_incremental_mode:
+            # filter models to run based on the ones that have not been calculated yet
+            models_to_run = [
+                (model_name, model_class)
+                for model_name, model_class in models_to_run
+                if model_name not in calculated_models
+            ]
+            images_to_run_by_model = {
+                model_name: set(
+                    assessment["file_name"]
+                    for assessment in assessments
+                    if assessment["file_name"] not in assessments_by_model.get(model_name, {})
+                )
+                for model_name, _ in model_providers.items()
+            }
+        else:
+            images_to_run_by_model = {
+                model_name: set(
+                    assessment["file_name"]
+                    for assessment in assessments
+                )
+                for model_name, _ in models_to_run
+            }
+
+        # add to models to run where file name > 0
+        models_to_run = [
+            (model_name, model_class)
+            for model_name, model_class in model_providers.items()
+            if images_to_run_by_model[model_name]
+        ]
 
         with concurrent.futures.ThreadPoolExecutor(max_workers=20) as executor:
             futures = [
                 executor.submit(run_model_with_prompt, model_name, model_class, assessment)
-                for assessment in assessments
-                for model_name, model_class in model_providers.items()
+                for assessment in images_to_run_by_model[model_name]
+                for model_name, model_class in models_to_run
             ]
 
             total_assessments = len(futures)
@@ -259,6 +375,7 @@ def main():
                 desc="Running assessments",
             ):
                 model_name, assessment, result, answer, time_taken = future.result()
+                print(model_name, assessment["file_name"], result, answer, time_taken)
                 if result is None:
                     print(
                         f"Skipping {model_name} for {assessment['file_name']} as no result is returned"
@@ -278,7 +395,11 @@ def main():
                     len(normalise_output(result)) > 1
                     and normalise_output(answer) in normalise_output(result)
                 )
+                if not assessments_by_model.get(model_name):
+                    assessments_by_model[model_name] = {}
+
                 assessments_by_model[model_name][assessment["file_name"]] = payload
+        
         model_results = {}
 
     for model_name, results in assessments_by_model.items():
@@ -292,11 +413,6 @@ def main():
             "logo": logos[model_name],
             "average_time": f"{sum(times_by_model[model_name]) / len(times_by_model[model_name]):.2f}s",
         }
-
-    # transform assessments_by_model[model_name][assessment["file_name"]] to the last item
-    # for model_name, results in assessments_by_model.items():
-    #     for assessment in results.values():
-    #         results[assessment["file_name"]] = assessment
 
     # order model results by percentage
     model_results = dict(
@@ -570,7 +686,7 @@ def main():
         # print(compressed_src)
         compressed_dst = os.path.join(OUTPUT_DIR, "images", "compressed/", assessment["file_name"].replace(".png", ".jpeg"))
         if os.path.exists(compressed_src):
-            print(f"Copying {compressed_src} to {compressed_dst}")
+            # print(f"Copying {compressed_src} to {compressed_dst}")
             os.makedirs(os.path.join(OUTPUT_DIR, "images", "compressed/"), exist_ok=True)
             shutil.copy(compressed_src, compressed_dst)
 
@@ -644,7 +760,7 @@ def main():
             file.write(assessment_output)
 
     for model1, model2 in model_combinations:
-        print(f"Comparing {model1} and {model2}")
+        # print(f"Comparing {model1} and {model2}")
         by_category_results = defaultdict(lambda: defaultdict(dict))
 
         for category in assessment_categories:
@@ -652,6 +768,9 @@ def main():
             model2_results = []
             for assessment in assessments:
                 if assessment["category"] != category:
+                    continue
+                # skip if not assessments by model
+                if not assessments_by_model.get(model1) or not assessments_by_model.get(model2):
                     continue
                 model1_result = assessments_by_model[model1].get(assessment["file_name"])
                 model2_result = assessments_by_model[model2].get(assessment["file_name"])
@@ -693,7 +812,10 @@ def main():
 
         # create a compare page for each model combination
         # render the compare template with the model data and results
-
+        # if not times, skip
+        if not times_by_model.get(model1) or not times_by_model.get(model2):
+            print(f"Skipping comparison for {model1} and {model2} as no results found")
+            continue
         compare_output = compare_template.render(
             model1=model1,
             model2=model2,
