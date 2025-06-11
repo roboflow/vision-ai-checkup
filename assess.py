@@ -80,6 +80,7 @@ open_or_closed_source = {
     "Llama 4 Maverick 17B": "closed",
     "Claude 4 Opus": "closed",
     "OpenAI O3": "closed",
+    "OpenAI o3-pro": "closed",
 }
 
 models_in_playground = set([
@@ -96,6 +97,7 @@ models_in_playground = set([
     "GPT-4.1 Nano",
     "ChatGPT-4o",
     "OpenAI O4 Mini",
+    "OpenAI o3-pro"
 ]) 
 
 
@@ -124,7 +126,6 @@ def main():
         return value
 
     logos = {
-        "DeepSeek R1": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcREUufvK7RFFGsbQTZQq9BZgFASSDa7xOTb1A&s",
         "Llama 3 11B Vision": "https://signsalad.com/wp-content/uploads/2021/11/Screenshot-2021-11-03-at-12.14.11.png",
         "Llama 3 70B": "https://signsalad.com/wp-content/uploads/2021/11/Screenshot-2021-11-03-at-12.14.11.png",
         "Llama 4 Maverick 17B": "https://signsalad.com/wp-content/uploads/2021/11/Screenshot-2021-11-03-at-12.14.11.png",
@@ -158,6 +159,7 @@ def main():
         "Gemma 3 4B": "https://www.google.com/favicon.ico",
         "Gemini 1.5 Flash": "https://www.google.com/favicon.ico",
         "Gemini 1.5 Pro": "https://www.google.com/favicon.ico",
+        "OpenAI o3-pro": "https://openai.com/favicon.ico",
         "Arcee.ai Spotlight": "https://cdn.prod.website-files.com/6781a10424493fe352bc6cb5/678e92cb5d392e76c953e690_Favicon.png",
         "Phi 4 Multimodal": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/Microsoft_logo.svg/1024px-Microsoft_logo.svg.png?20210729021049",
     }
@@ -260,6 +262,7 @@ def main():
             "Gemini 1.5 Flash": "",
             "Gemini 1.5 Pro": "",
             "Arcee.ai Spotlight": "",
+            "OpenAI o3-pro": "",
         }
         # load from saved_results
         assessments_by_model = final_results["assessments_by_model"]
@@ -294,6 +297,7 @@ def main():
                 base_url="https://router.huggingface.co/together/v1",
                 api_key=os.environ.get("HUGGINGFACE_API_KEY"),
             ),
+            "OpenAI o3-pro": OpenAIModel(model_id="o3-pro"),
             "Claude 3.7 Sonnet": AnthropicModel(model_id="claude-3-7-sonnet-20250219"),
             "Claude 3.5 Haiku": AnthropicModel(model_id="claude-3-5-haiku-20241022"),
             "Gemini 2.5 Pro Preview": GeminiModel(model_id="gemini-2.5-pro-preview-03-25"),
@@ -304,11 +308,6 @@ def main():
             "Gemini 2.5 Flash Preview": GeminiModel(model_id="gemini-2.5-flash-preview-04-17"),
             "Cohere Aya Vision 8B": CohereModel(model_id="c4ai-aya-vision-8b"),
             "Cohere Aya Vision 32B": CohereModel(model_id="c4ai-aya-vision-32b"),
-            "DeepSeek R1": CustomOpenAIModel(
-                model_id="deepseek-ai/DeepSeek-R1",
-                base_url="https://router.huggingface.co/hyperbolic/v1",
-                api_key=os.environ.get("HUGGINGFACE_API_KEY"),
-            ),
             "Qwen 2.5 VL 7B": CustomOpenAIModel(
                 model_id="Qwen/Qwen2.5-VL-7B-Instruct",
                 base_url="https://router.huggingface.co/hyperbolic/v1",

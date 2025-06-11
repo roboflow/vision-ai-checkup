@@ -5,11 +5,11 @@ from openai import BadRequestError, OpenAI
 from .model import Model
 
 OPENAI_TEMPERATURE = 0.1
-SKIP_TEMPERATURE = ["o4-mini", "chatgpt-4o-latest", "o3", "o1"]
+SKIP_TEMPERATURE = ["o4-mini", "chatgpt-4o-latest", "o3", "o1", "o3-pro"]
 
 
 class OpenAIModel(Model):
-    def __init__(self, model_id: str):
+    def __init__(self, model_id: str, ):
         self.model_id = model_id
         self.client = OpenAI()
 
@@ -54,18 +54,16 @@ class OpenAIModel(Model):
             except BadRequestError as e:
                 print(f"Error parsing structured output: {e}")
                 pass
-        completion = self.client.chat.completions.create(
+        completion = self.client.responses.create(
             model=self.model_id,
-            messages=[
+            input=[
                 {
                     "role": "user",
                     "content": [
-                        {"type": "text", "text": prompt},
+                        {"type": "input_text", "text": prompt},
                         {
-                            "type": "image_url",
-                            "image_url": {
-                                "url": f"data:{image_dtype};base64,{base64.b64encode(image).decode()}"
-                            },
+                            "type": "input_image",
+                            "image_url": f"data:{image_dtype};base64,{base64.b64encode(image).decode()}"
                         },
                     ],
                 },
@@ -75,4 +73,4 @@ class OpenAIModel(Model):
             ),
         )
 
-        return completion.choices[0].message.content
+        return completion.output_text
