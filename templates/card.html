@@ -31,7 +31,8 @@
                         <a class="btn-primary" href="https://playground.roboflow.com" style="grid-column: span 2;text-align: center;align-content: center;">Test {{ model_name }} in our Model Playground</a>
                     {% endif %}
                     {% if model_description %}
-                        <div class="card">
+                        <div class="card col-span-2">
+                            <h2>About {{ model_name }}</h2>
                             {{ model_description }}
                         </div>
                     {% endif %}
