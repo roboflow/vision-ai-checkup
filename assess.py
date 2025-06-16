@@ -115,6 +115,7 @@ def main():
     assessment_template = env.get_template("assessment.html")
     compare_template = env.get_template("compare.html")
     sitemap_template = env.get_template("sitemap.xml")
+    llms_txt_template = env.get_template("llms.txt")
 
     def slugify(value):
         """Convert a string to a slug."""
@@ -925,6 +926,14 @@ def main():
     )
     with open(os.path.join(OUTPUT_DIR, "sitemap.xml"), "w") as file:
         file.write(sitemap_output)
+
+    llms_txt = llms_txt_template.render(
+        leaderboards={title: url for title, url in zip(assessment_categories, [f"/{slugify(category)}/" for category in assessment_categories])},
+        models={title: url for title, url in zip(model_providers.keys(), [f"/{slugify(model_name)}/" for model_name in model_providers.keys()])},
+        comparisons={title: url for title, url in zip([f"{m1} vs {m2}" for m1, m2 in model_combinations], [f"/compare/{slugify(m1)}-vs-{slugify(m2)}/" for m1, m2 in model_combinations])},
+    )
+    with open(os.path.join(OUTPUT_DIR, "llms.txt"), "w") as file:
+        file.write(llms_txt)
 
     assets_dir = "assets/"
     if os.path.exists(assets_dir):
