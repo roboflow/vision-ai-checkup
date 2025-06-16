@@ -621,6 +621,7 @@ def main():
             task=category.replace(" ", "-").lower(),
             title=f"Best {category} Models - Vision AI Checkup",
             description=f"Explore the best models for {category} tasks.",
+            leaderboard_title=f"Best {category} Models"
         )
 
         with open(os.path.join(OUTPUT_DIR, f"{slugify(category)}.html"), "w") as file:
