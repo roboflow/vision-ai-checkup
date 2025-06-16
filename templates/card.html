@@ -30,6 +30,11 @@
                     {% if model_in_playground %}
                         <a class="btn-primary" href="https://playground.roboflow.com" style="grid-column: span 2;text-align: center;align-content: center;">Test {{ model_name }} in our Model Playground</a>
                     {% endif %}
+                    {% if model_description %}
+                        <div class="card">
+                            {{ model_description }}
+                        </div>
+                    {% endif %}
                 </div>
             </section>
 

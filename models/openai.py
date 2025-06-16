@@ -5,7 +5,7 @@ from openai import BadRequestError, OpenAI
 from .model import Model
 
 OPENAI_TEMPERATURE = 0.1
-SKIP_TEMPERATURE = ["o4-mini", "chatgpt-4o-latest", "o3", "o1", "o3-pro"]
+SKIP_TEMPERATURE = ["o4-mini", "chatgpt-4o-latest", "o3", "o1", "o3-pro", "o4-mini-high"]
 
 
 class OpenAIModel(Model):

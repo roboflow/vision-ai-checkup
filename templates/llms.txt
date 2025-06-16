@@ -1,0 +1,27 @@
+# Vision AI Checkup
+
+> Vision AI Checkup measures how well new multimodal models perform at real world use cases.
+
+> Our assessment consists of dozens of images, questions, and answers that we benchmark against models. We run the checkup every time we add a new model to the leaderboard.
+
+> You can use the Vision AI checkup to gauge how well a model does generally, without having to understand a complex benchmark with thousands of data points.
+
+> The assessment and models are constantly evolving. This means that as more tasks get added or models receive updates, we can build a clearer picture of the current state-of-the-art models in real-time.
+
+## Leaderboards
+
+{% for leaderboard, url in leaderboards.items() %}
+- [{{ leaderboard }}]({{ url }})
+{% endfor %}
+
+## Models
+
+{% for model, url in models.items() %}
+- [{{ model }}]({{ url }})
+{% endfor %}
+
+## Comparisons
+
+{% for comparison, url in comparisons.items() %}
+- [{{ comparison }}]({{ url }})
+{% endfor %}

@@ -13,11 +13,17 @@ import time
 from urllib.parse import quote_plus
 
 from jinja2 import Environment, FileSystemLoader
+import datetime
 from tqdm import tqdm
 from itertools import combinations
 import optparse
 
 is_in_incremental_mode = False
+
+with open("models.csv", "r") as file:
+    reader = csv.DictReader(file)
+    model_info = list(reader)
+
 def parse_args():
     parser = optparse.OptionParser()
     parser.add_option(
@@ -372,6 +378,7 @@ def main():
                 for model_name, model_class in models_to_run
                 if model_name not in calculated_models
             ]
+
             images_to_run_by_model = {
                 model_name: set(
                     assessment["file_name"]
@@ -388,20 +395,17 @@ def main():
                 )
                 for model_name, _ in models_to_run
             }
+        new_models = [
+            (model_name, model_class)
+            for model_name, model_class in model_providers.items()
+            if model_name not in calculated_models
+        ]
 
-        # add to models to run where file name > 0
         models_to_run = [
             (model_name, model_class)
             for model_name, model_class in model_providers.items()
             if len(images_to_run_by_model[model_name]) > 0
         ]
-        print(models_to_run, "models to run")
-
-        # print(images_to_run_by_model["Claude 4 Opus"])
-
-        # print(models_to_run, "d")
-        # print(images_to_run_by_model["Gemini 1.5 Pro"])
-        # exit()§
 
         with concurrent.futures.ThreadPoolExecutor(max_workers=20) as executor:
             futures = [
@@ -411,7 +415,7 @@ def main():
             ]
 
             total_assessments = len(futures)
-            print(models_to_run)
+
             for future in tqdm(
                 concurrent.futures.as_completed(futures),
                 total=total_assessments,
@@ -544,6 +548,7 @@ def main():
         task="all",
         title="Vision AI Checkup",
         open_or_closed_source=open_or_closed_source,
+        added_models=[m for m in model_results.get("added_on", []) if m == datetime.date.today().isoformat()],
     )
 
     models = list(model_providers.keys())
@@ -663,6 +668,7 @@ def main():
 
             file.write(
                 card_template.render(
+                    model_description=([model_info_item["description"] for model_info_item in model_info if model_info_item["model_name"] == model_name] + [""])[0],
                     open_or_closed_source=open_or_closed_source,
                     model_name=model_name,
                     model_in_playground=model_name in models_in_playground,
@@ -717,6 +723,14 @@ def main():
             return obj
         
     saved_results = delete_bytes(saved_results)
+
+    if not saved_results.get("added_on"):
+        june_first = datetime.datetime(2025, 6, 1).isoformat()
+        saved_results["added_on"] = {model_name: june_first for model_name in assessments_by_model.keys()}
+    
+    # for model in new_models:
+    #     if model[0] not in saved_results["added_on"]:
+    #         saved_results["added_on"][model[0]] = datetime.now().isoformat()
 
     with open("model_results.json", "w") as file:
         file.write(json.dumps(saved_results, indent=4))
