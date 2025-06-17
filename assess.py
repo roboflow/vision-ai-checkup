@@ -70,6 +70,7 @@ open_or_closed_source = {
     "Gemini 2.0 Flash": "closed",
     "Gemini 2.0 Flash Lite": "closed",
     "Gemini 2.5 Flash Preview": "closed",
+    "Gemini 2.5 Flash-Lite Preview": "closed",
     "Cohere Aya Vision 8B": "closed",
     "Cohere Aya Vision 32B": "closed",
     "Qwen 2.5 VL 7B": "open",
@@ -151,6 +152,7 @@ def main():
         "Gemini 2.5 Pro Preview": "https://www.google.com/favicon.ico",
         "Gemini 2.0 Flash": "https://www.google.com/favicon.ico",
         "Gemini 2.0 Flash Lite": "https://www.google.com/favicon.ico",
+        "Gemini 2.5 Flash-Lite Preview": "https://www.google.com/favicon.ico",
         "Gemma 3 27b": "https://www.google.com/favicon.ico",
         "OpenAI O4 Mini": "https://openai.com/favicon.ico",
         "Gemini 2.5 Flash Preview": "https://www.google.com/favicon.ico",
@@ -313,6 +315,7 @@ def main():
             "Gemini 2.0 Flash": GeminiModel(model_id="gemini-2.0-flash"),
             "Gemini 2.0 Flash Lite": GeminiModel(model_id="gemini-2.0-flash-lite"),
             "Gemini 2.5 Flash Preview": GeminiModel(model_id="gemini-2.5-flash-preview-04-17"),
+            "Gemini 2.5 Flash-Lite Preview": GeminiModel(model_id="gemini-2.5-flash-lite-preview-06-17"),
             "Cohere Aya Vision 8B": CohereModel(model_id="c4ai-aya-vision-8b"),
             "Cohere Aya Vision 32B": CohereModel(model_id="c4ai-aya-vision-32b"),
             "Qwen 2.5 VL 7B": CustomOpenAIModel(
@@ -665,7 +668,7 @@ def main():
             for category, category_results in result_assessments_by_model_by_category[model_name].items():
                 if category_results["passed_percentage"] == max_percentage:
                     best_categories.append(category)
-
+            print([model_info_item["description"] for model_info_item in model_info if model_info_item["model_name"] == model_name])
             file.write(
                 card_template.render(
                     model_description=([model_info_item["description"] for model_info_item in model_info if model_info_item["model_name"] == model_name] + [""])[0],
