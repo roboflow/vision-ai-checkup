@@ -541,11 +541,21 @@ def main():
         else:
             result["position"] = model_results_list[i - 1]["position"] + 1
 
+    print(new_models)
+    with open("./model_results.json", "r") as file:
+        saved_results = orjson.loads(file.read())
+    print(saved_results['added_on'])
+    # new models should have datetime added as today
+    seven_days_ago = (datetime.date.today() - datetime.timedelta(days=7)).isoformat()
+    new_models = [model_name for model_name, date in saved_results.get("added_on", {}).items() if date > seven_days_ago]
+
     output = template.render(
         assessments_by_model=assessments_by_model,
         model_providers=model_providers,
         model_results=model_results_list,
         assessments=assessments,
+        new_models=new_models,
+        model_dates=saved_results.get("added_on", {}),
         assessment_count=len(assessments),
         tasks=assessment_categories,
         task="all",
@@ -622,6 +632,8 @@ def main():
         category_output = template.render(
             assessments_by_model=assessments_by_model,
             model_providers=model_providers,
+            model_dates=saved_results.get("added_on", {}),
+            new_models=new_models,
             model_results=category_model_results_list,
             assessments=category_assessments,
             assessment_count=len(category_assessments),
@@ -668,7 +680,7 @@ def main():
             for category, category_results in result_assessments_by_model_by_category[model_name].items():
                 if category_results["passed_percentage"] == max_percentage:
                     best_categories.append(category)
-            print([model_info_item["description"] for model_info_item in model_info if model_info_item["model_name"] == model_name])
+
             file.write(
                 card_template.render(
                     model_description=([model_info_item["description"] for model_info_item in model_info if model_info_item["model_name"] == model_name] + [""])[0],
@@ -709,6 +721,7 @@ def main():
         "assessment_count": len(assessments),
         "tasks": assessment_categories,
         "final_results": final_results,
+        "added_on": saved_results.get("added_on", {}) if saved_results else {},
     }
     # TypeError: Object of type bytes is not JSON serializable
     # delete bytes recursively
@@ -727,10 +740,15 @@ def main():
         
     saved_results = delete_bytes(saved_results)
 
-    if not saved_results.get("added_on"):
+    with open("model_results.json", "r") as file:
+        m_results = orjson.loads(file.read())
+
+    if not m_results.get("added_on"):
         june_first = datetime.datetime(2025, 6, 1).isoformat()
         saved_results["added_on"] = {model_name: june_first for model_name in assessments_by_model.keys()}
-    
+    else:
+        saved_results["added_on"] = m_results.get("added_on", {})
+
     # for model in new_models:
     #     if model[0] not in saved_results["added_on"]:
     #         saved_results["added_on"][model[0]] = datetime.now().isoformat()

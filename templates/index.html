@@ -34,7 +34,18 @@
             </div>
             {% for model in model_results %}
                 <a role="row" class="model-row {% if loop.index > 10 %}hidden{% endif %}" href="/{{ model["model_name"].replace(' ', '-').lower().replace('.', '-') }}/">
-                    <div class="flex flex-nowrap items-center flex-1 gap-1 whitespace-nowrap text-violet-700">#{{ model["position"] }} <img src="{{ model['logo'] }}" class="w-4 h-4"> {{ model["model_name"] }}</div>
+                    <div class="flex flex-nowrap items-center flex-1 gap-1 whitespace-nowrap text-violet-700">#{{ model["position"] }} <img src="{{ model['logo'] }}" class="w-4 h-4"> {{ model["model_name"] }} {% if model["model_name"] in new_models %}<span class="new" style="color: white;padding-left: 0.5rem;padding-right: 0.5rem;background: rgb(109 40 217/var(--tw-text-opacity,1));border-radius: 0.875rem;margin-left: 0.25rem;font-size: 0.7rem;" id="model-{{ model['model_name'] }}-new">
+                        New</span>{% endif %}</div>
+                        <span id="model-{{ model['model_name'] }}-date" class="date"></span>
+                        <script>
+                            // / show date on hover of new
+                            document.getElementById('model-{{ model["model_name"] }}-new').addEventListener('mouseover', function() {
+                                this.textContent = 'New since {{ model_dates[model["model_name"]].split("T")[0] }}';
+                            });
+                            document.getElementById('model-{{ model["model_name"] }}-new').addEventListener('mouseout', function() {
+                                this.textContent = 'New';
+                            });
+                        </script>
                     <div class="w-14 text-center">{{ model["percentage"] }}%</div>
                     <div class="w-32 text-center">
                         {% if not category %}
