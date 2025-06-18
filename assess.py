@@ -33,6 +33,14 @@ def parse_args():
         default=False,
         help="Run in incremental mode, only updating changed files.",
     )
+    # watch
+    parser.add_option(
+        "--watch",
+        action="store_true",
+        dest="watch",
+        default=False,
+        help="Watch for changes in the directory and update the docs incrementally.",
+    )
     options, _ = parser.parse_args()
     return options
 

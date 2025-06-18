@@ -26,17 +26,30 @@
         <div class="mb-2 text-sm text-zinc-600">
             Run on {{ assessment_count }} prompts.
         </div>
+        <style>
+            #score-option, #time-option {
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            svg {
+                height: 1rem;
+            }
+        </style>
         <div role="table" class="w-full bg-white rounded-lg overflow-hidden overflow-x-auto shadow-sm text-sm mb-3">
             <div role="row" class="flex flex-nowrap min-w-[500px] gap-4 font-medium px-4 py-2 text-zinc-900">
-                <div class="flex-1">Model</div>
-                <div class="w-14 text-center">Score</div>
-                <div class="w-32 text-center" title="Average Model Response Time per Prompt">Avg Time / Prompt</div>
+                <div class="flex-1" style="align-content: center;">Model</div>
+                <div class="w-14 text-center" id="score-option">Score <div class="score-arrow"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="#000000" viewBox="0 0 256 256"><path d="M205.66,149.66l-72,72a8,8,0,0,1-11.32,0l-72-72a8,8,0,0,1,11.32-11.32L120,196.69V40a8,8,0,0,1,16,0V196.69l58.34-58.35a8,8,0,0,1,11.32,11.32Z"></path></svg></div></div>
+                <div class="w-32 text-center" title="Average Model Response Time per Prompt" id="time-option">Avg Time / Prompt <div class="time-arrow"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="#000000" viewBox="0 0 256 256"><path d="M205.66,149.66l-72,72a8,8,0,0,1-11.32,0l-72-72a8,8,0,0,1,11.32-11.32L120,196.69V40a8,8,0,0,1,16,0V196.69l58.34-58.35a8,8,0,0,1,11.32,11.32Z"></path></svg></div></div>
             </div>
+            <div class="rows">
             {% for model in model_results %}
                 <a role="row" class="model-row {% if loop.index > 10 %}hidden{% endif %}" href="/{{ model["model_name"].replace(' ', '-').lower().replace('.', '-') }}/">
                     <div class="flex flex-nowrap items-center flex-1 gap-1 whitespace-nowrap text-violet-700">#{{ model["position"] }} <img src="{{ model['logo'] }}" class="w-4 h-4"> {{ model["model_name"] }} {% if model["model_name"] in new_models %}<span class="new" style="color: white;padding-left: 0.5rem;padding-right: 0.5rem;background: rgb(109 40 217/var(--tw-text-opacity,1));border-radius: 0.875rem;margin-left: 0.25rem;font-size: 0.7rem;" id="model-{{ model['model_name'] }}-new">
                         New</span>{% endif %}</div>
                         <span id="model-{{ model['model_name'] }}-date" class="date"></span>
+                        {% if model["model_name"] in new_models %}
                         <script>
                             // / show date on hover of new
                             document.getElementById('model-{{ model["model_name"] }}-new').addEventListener('mouseover', function() {
@@ -46,14 +59,16 @@
                                 this.textContent = 'New';
                             });
                         </script>
-                    <div class="w-14 text-center">{{ model["percentage"] }}%</div>
-                    <div class="w-32 text-center">
+                        {% endif %}
+                    <div class="w-14 text-center score">{{ model["percentage"] }}%</div>
+                    <div class="w-32 text-center time">
                         {% if not category %}
                         {{ model["average_time"] }}
                         {% endif %}
                     </div>
                 </a>
             {% endfor %}
+            </div>
         </div>
 
         <button id="toggle-more-btn" type="button" class="link">
@@ -87,7 +102,72 @@
         </a>
     </div>
 </section>
+                <script>
+                    // if score clicked, order by score
+                    var arrowDown = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="#000000" viewBox="0 0 256 256"><path d="M205.66,149.66l-72,72a8,8,0,0,1-11.32,0l-72-72a8,8,0,0,1,11.32-11.32L120,196.69V40a8,8,0,0,1,16,0V196.69l58.34-58.35a8,8,0,0,1,11.32,11.32Z"></path></svg>`;
+                    var arrowUp = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="#000000" viewBox="0 0 256 256"><path d="M205.66,117.66a8,8,0,0,1-11.32,0L136,59.31V216a8,8,0,0,1-16,0V59.31L61.66,117.66a8,8,0,0,1-11.32-11.32l72-72a8,8,0,0,1,11.32,0l72,72A8,8,0,0,1,205.66,117.66Z"></path></svg>`;
+                    function sortBy (field, order) {
+                        var f = document.getElementById(field);
+                        var allScores = document.getElementsByClassName("score");
+                        console.log(allScores)
+                        var allScoreParentRows = allScores.length > 0 ? Array.from(allScores).map(function(score) {
+                            return score.parentElement;
+                        }) : [];
+                        console.log(allScoreParentRows)
+                        // sort by score
+                        // add data-score attribute to each row
+                        allScoreParentRows.forEach(function(row) {
+                            var score = row.querySelector(".score");
+                            if (score) {
+                                row.setAttribute("data-score-option", score.textContent.replace('%', ''));
+                            }
+                            var time = row.querySelector(".time");
+                            if (time) {
+                                row.setAttribute("data-time-option", time.textContent);
+                            }
+                        });
+                        allScoreParentRows.sort(function(a, b) {
+                            var scoreA = parseFloat(a.getAttribute("data-" +  field) || 0);
+                            var scoreB = parseFloat(b.getAttribute("data-" +  field) || 0);
+                            if (order === "asc") { 
+                                return scoreA - scoreB;
+                            } else {
+                                return scoreB - scoreA;
+                            }
+                        });
+                        var table = document.querySelector(".rows");
+                        table.innerHTML = ""; // clear the table
+                        console.log(allScoreParentRows, "x")
+                        allScoreParentRows.forEach(function(row) {
+                            table.appendChild(row);
+                        });
+                        // update the order attribute and aria-label
+                        // var order = f.getAttribute("data-order") || "desc";
+                        if (order === "asc") {
+                            allScoreParentRows.reverse();
+                        }
+                        console.log("Sorted by " + field + " in " + order + " order");
+                        // change arrow
+                        var arrow = order === "asc" ? arrowUp : arrowDown;
+                        f.querySelector(".score-arrow, .time-arrow").innerHTML = arrow;
 
+
+                        f.setAttribute("data-order", order === "asc" ? "desc" : "asc");
+                        f.setAttribute("aria-label", "Sort by " + field + " in " + (order === "asc" ? "descending" : "ascending") + " order");
+                        f.classList.toggle("desc", order === "desc");
+                        f.classList.toggle("asc", order === "asc");
+                    }
+                    document.getElementById("score-option").addEventListener("click", function() {
+                        var order = this.getAttribute("data-order") || "asc";
+                        sortBy("score-option", order);
+                        console.log("test");
+                    });
+                    document.getElementById("time-option").addEventListener("click", function() {
+                        var order = this.getAttribute("data-order") || "asc";
+                        console.log(order, "x")
+                        sortBy("time-option", order);
+                    });
+                </script>
 <section>
     <div class="container">
         <h2 class="h2 mb-3" id="about">About Vision AI Checkup</h2>
