@@ -18,7 +18,7 @@
                 <select id="model-select" class="select">
                     <option value="all">Best overall</option>
                     {% for task in tasks %}
-                        <option value="{{ task.lower().replace(' ', '-') }}" {% if task == category %}selected{% endif %}>{{ task }}</option>
+                        <option value="{{ task.lower().replace(' ', '-').replace('(', '-').replace(')', '-') }}" {% if task == category %}selected{% endif %}>{{ task }}</option>
                     {% endfor %}
                 </select>
             </div>
@@ -45,7 +45,7 @@
             </div>
             <div class="rows">
             {% for model in model_results %}
-                <a role="row" class="model-row {% if loop.index > 10 %}hidden{% endif %}" href="/{{ model["model_name"].replace(' ', '-').lower().replace('.', '-') }}/">
+                <a role="row" class="model-row {% if loop.index > 10 %}hidden{% endif %}" href="/{{ model["model_name"].replace(' ', '-').lower().replace('.', '-').replace('(', '-').replace(')', '-') }}/">
                     <div class="flex flex-nowrap items-center flex-1 gap-1 whitespace-nowrap text-violet-700">#{{ model["position"] }} <img src="{{ model['logo'] }}" class="w-4 h-4"> {{ model["model_name"] }} {% if model["model_name"] in new_models %}<span class="new" style="color: white;padding-left: 0.5rem;padding-right: 0.5rem;background: rgb(109 40 217/var(--tw-text-opacity,1));border-radius: 0.875rem;margin-left: 0.25rem;font-size: 0.7rem;" id="model-{{ model['model_name'] }}-new">
                         New</span>{% endif %}</div>
                         <span id="model-{{ model['model_name'] }}-date" class="date"></span>

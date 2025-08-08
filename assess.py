@@ -148,6 +148,17 @@ def main():
         "Llama 4 Scout 17B": "https://signsalad.com/wp-content/uploads/2021/11/Screenshot-2021-11-03-at-12.14.11.png",
         "GPT-4.1": "https://openai.com/favicon.ico",
         "ChatGPT-4o": "https://openai.com/favicon.ico",
+        "GPT-5 (high reasoning)": "https://openai.com/favicon.ico",
+        "GPT-5": "https://openai.com/favicon.ico",
+        "GPT-5 Mini": "https://openai.com/favicon.ico",
+        "GPT-5 Nano": "https://openai.com/favicon.ico",
+        "GPT-5 Chat": "https://openai.com/favicon.ico",
+        "OpenAI O4 Mini (Medium Reasoning)": "https://openai.com/favicon.ico",
+        "OpenAI O4 Mini (High Reasoning)": "https://openai.com/favicon.ico",
+        "OpenAI O3 (High Reasoning)": "https://openai.com/favicon.ico",
+        "OpenAI O3 (Medium Reasoning)": "https://openai.com/favicon.ico",
+        "ChatGPT-4o (Medium Reasoning)": "https://openai.com/favicon.ico",
+        "ChatGPT-4o (High Reasoning)": "https://openai.com/favicon.ico",
         "OpenAI O1 Pro": "https://openai.com/favicon.ico",
         "GPT-4.1 Mini": "https://openai.com/favicon.ico",
         "GPT-4.1 Nano": "https://openai.com/favicon.ico",
@@ -157,17 +168,18 @@ def main():
         "Claude 3.7 Sonnet": "https://www.anthropic.com/favicon.ico",
         "Qwen 2.5 VL 7B": "https://cdn-avatars.huggingface.co/v1/production/uploads/620760a26e3b7210c2ff1943/-s1gyJfvbE1RgO5iBeNOi.png",
         "Claude 3.5 Haiku": "https://www.anthropic.com/favicon.ico",
-        "Gemini 2.5 Pro Preview": "https://www.google.com/favicon.ico",
+        "Gemini 2.5 Pro": "https://www.google.com/favicon.ico",
         "Gemini 2.0 Flash": "https://www.google.com/favicon.ico",
         "Gemini 2.0 Flash Lite": "https://www.google.com/favicon.ico",
-        "Gemini 2.5 Flash-Lite Preview": "https://www.google.com/favicon.ico",
+        "Gemini 2.5 Flash Lite": "https://www.google.com/favicon.ico",
         "Gemma 3 27b": "https://www.google.com/favicon.ico",
         "OpenAI O4 Mini": "https://openai.com/favicon.ico",
-        "Gemini 2.5 Flash Preview": "https://www.google.com/favicon.ico",
+        "Gemini 2.5 Flash": "https://www.google.com/favicon.ico",
         "Cohere Aya Vision 8B": "https://cohere.com/favicon.ico",
         "Cohere Aya Vision 32B": "https://cohere.com/favicon.ico",
         "Claude 4 Sonnet": "https://www.anthropic.com/favicon.ico",
         "Claude 4 Opus": "https://www.anthropic.com/favicon.ico",
+        "Claude 4.1 Opus": "https://www.anthropic.com/favicon.ico",
         "Gemma 3n 4B": "https://www.google.com/favicon.ico",
         "Mistral Medium 3": "https://mistral.ai/favicon.ico",
         "Gemma 3 1B": "https://mistral.ai/favicon.ico",
@@ -200,7 +212,7 @@ def main():
     assessments_by_model = defaultdict(lambda: defaultdict(list))
 
     def run_model_with_prompt(model_name, model, assessment):
-        print(model_name, assessment)
+        # print(model_name, assessment)
         if isinstance(assessment, str):
             # get assessment by file name
             assessment = [a for a in assessments if a["file_name"] == assessment][0]
@@ -210,9 +222,9 @@ def main():
         ) as image_file:
             assessment["image"] = image_file.read()
         start_time = time.time()
-        print(
-            f"Running {model_name} with image {assessment['file_name']} and prompt {assessment['prompt']}"
-        )
+        # print(
+        #     f"Running {model_name} with image {assessment['file_name']} and prompt {assessment['prompt']}"
+        # )
 
         result = model.run_with_retry(
             assessment["image"],
@@ -263,6 +275,11 @@ def main():
             "Gemini 2.0 Flash Lite": "",
             "Gemini 2.5 Flash Preview": "",
             "Cohere Aya Vision 8B": "",
+            "GPT-5 (high reasoning)": "",
+            "GPT-5": "",
+            "GPT-5 Mini": "",
+            "GPT-5 Nano": "",
+            "GPT-5 Chat": "",
             "Cohere Aya Vision 32B": "",
             "Qwen 2.5 VL 7B": "",
             "Mistral Small 3.1 24b": "",
@@ -271,6 +288,7 @@ def main():
             "Gemma 3 27b": "",
             "Claude 4 Sonnet": "",
             "Claude 4 Opus": "",
+            "Claude 4.1 Opus": "",
             "Mistral Medium 3": "",
             "Gemma 3 1B": "",
             "Mistral Small 3.1 24B": "",
@@ -296,39 +314,48 @@ def main():
         model_providers = {
             "Claude 4 Sonnet": AnthropicModel(model_id="claude-sonnet-4-20250514"),
             "Claude 4 Opus": AnthropicModel(model_id="claude-opus-4-20250514"),
-            "OpenAI O4 Mini": OpenAIModel(model_id="o4-mini"),
-            "OpenAI O3": OpenAIModel(model_id="o3"),
+            "Claude 4.1 Opus": AnthropicModel(model_id="claude-opus-4-1-20250805"),
+            "OpenAI O4 Mini (High Reasoning)": OpenAIModel(model_id="o4-mini", reasoning_effort="high"),
+            "OpenAI O3 (High Reasoning)": OpenAIModel(model_id="o3", reasoning_effort="high"),
+            "OpenAI O4 Mini (Medium Reasoning)": OpenAIModel(model_id="o4-mini"),
+            "OpenAI O3 (Medium Reasoning)": OpenAIModel(model_id="o3"),
             "GPT-4.1": OpenAIModel(model_id="gpt-4.1"),
-            "ChatGPT-4o": OpenAIModel(model_id="chatgpt-4o-latest"),
+            "ChatGPT-4o (Medium Reasoning)": OpenAIModel(model_id="chatgpt-4o-latest"),
+            "ChatGPT-4o (High Reasoning)": OpenAIModel(model_id="chatgpt-4o-latest", reasoning_effort="high"),
             "GPT-4.1 Mini": OpenAIModel(model_id="gpt-4.1-mini"),
             "GPT-4.1 Nano": OpenAIModel(model_id="gpt-4.1-nano"),
             "OpenAI O1": OpenAIModel(model_id="o1"),
-            "Llama 3 11B Vision": CustomOpenAIModel(model_id="meta-llama/Llama-3.2-11B-Vision-Instruct", base_url="https://router.huggingface.co/hf-inference/models/meta-llama/Llama-3.2-11B-Vision-Instruct/v1", api_key=os.environ.get("HUGGINGFACE_API_KEY")),
+            # "Llama 3 11B Vision": CustomOpenAIModel(model_id="meta-llama/Llama-3.2-11B-Vision-Instruct-Turbo:together", base_url="https://router.huggingface.co/v1", api_key=os.environ.get("HUGGINGFACE_API_KEY")),
             "Gemma 3 27b": CustomOpenAIModel(
-                model_id="google/gemma-3-27b-it-fast",
-                base_url="https://router.huggingface.co/nebius/v1",
+                model_id="google/gemma-3-27b-it:nebius",
+                base_url="https://router.huggingface.co/v1",
                 api_key=os.environ.get("HUGGINGFACE_API_KEY"),
             ),
             "Llama 4 Scout 17B": CustomOpenAIModel(
-                model_id="meta-llama/Llama-4-Scout-17B-16E-Instruct",
-                base_url="https://router.huggingface.co/together/v1",
+                model_id="meta-llama/Llama-4-Scout-17B-16E-Instruct:together",
+                base_url="https://router.huggingface.co/v1",
                 api_key=os.environ.get("HUGGINGFACE_API_KEY"),
             ),
             "OpenAI o3-pro": OpenAIModel(model_id="o3-pro"),
             "Claude 3.7 Sonnet": AnthropicModel(model_id="claude-3-7-sonnet-20250219"),
             "Claude 3.5 Haiku": AnthropicModel(model_id="claude-3-5-haiku-20241022"),
-            "Gemini 2.5 Pro Preview": GeminiModel(model_id="gemini-2.5-pro-preview-03-25"),
             "Gemini 1.5 Flash": GeminiModel(model_id="gemini-1.5-flash"),
             "Gemini 1.5 Pro": GeminiModel(model_id="gemini-1.5-pro"),
+            "GPT-5 (high reasoning)": OpenAIModel(model_id="gpt-5-2025-08-07", reasoning_effort="high"),
+            "GPT-5": OpenAIModel(model_id="gpt-5-2025-08-07"),
+            "GPT-5 Mini": OpenAIModel(model_id="gpt-5-mini"),
+            "GPT-5 Nano": OpenAIModel(model_id="gpt-5-nano"),
+            # "GPT-5 Chat": OpenAIModel(model_id="gpt-5-chat"),
             "Gemini 2.0 Flash": GeminiModel(model_id="gemini-2.0-flash"),
             "Gemini 2.0 Flash Lite": GeminiModel(model_id="gemini-2.0-flash-lite"),
-            "Gemini 2.5 Flash Preview": GeminiModel(model_id="gemini-2.5-flash-preview-04-17"),
-            "Gemini 2.5 Flash-Lite Preview": GeminiModel(model_id="gemini-2.5-flash-lite-preview-06-17"),
+            "Gemini 2.5 Flash": GeminiModel(model_id="gemini-2.5-flash"),
+            "Gemini 2.5 Flash Lite": GeminiModel(model_id="gemini-2.5-flash-lite"),
+            "Gemini 2.5 Pro": GeminiModel(model_id="gemini-2.5-pro"),
             "Cohere Aya Vision 8B": CohereModel(model_id="c4ai-aya-vision-8b"),
             "Cohere Aya Vision 32B": CohereModel(model_id="c4ai-aya-vision-32b"),
             "Qwen 2.5 VL 7B": CustomOpenAIModel(
-                model_id="Qwen/Qwen2.5-VL-7B-Instruct",
-                base_url="https://router.huggingface.co/hyperbolic/v1",
+                model_id="Qwen/Qwen2.5-VL-7B-Instruct:hyperbolic",
+                base_url="https://router.huggingface.co/v1",
                 api_key=os.environ.get("HUGGINGFACE_API_KEY"),
             ),
             "Mistral Medium 3": CustomOpenAIModel(
@@ -390,6 +417,8 @@ def main():
                 if model_name not in calculated_models
             ]
 
+            print(f"Models to run: {len(models_to_run)}")
+
             images_to_run_by_model = {
                 model_name: set(
                     assessment["file_name"]
@@ -406,17 +435,17 @@ def main():
                 )
                 for model_name, _ in models_to_run
             }
-        new_models = [
-            (model_name, model_class)
-            for model_name, model_class in model_providers.items()
-            if model_name not in calculated_models
-        ]
+        # new_models = [
+        #     (model_name, model_class)
+        #     for model_name, model_class in model_providers.items()
+        #     if model_name not in calculated_models
+        # ]
 
-        models_to_run = [
-            (model_name, model_class)
-            for model_name, model_class in model_providers.items()
-            if len(images_to_run_by_model[model_name]) > 0
-        ]
+        # models_to_run = [
+        #     (model_name, model_class)
+        #     for model_name, model_class in model_providers.items()
+        #     if len(images_to_run_by_model[model_name]) > 0
+        # ]
 
         with concurrent.futures.ThreadPoolExecutor(max_workers=20) as executor:
             futures = [
@@ -433,7 +462,7 @@ def main():
                 desc="Running assessments",
             ):
                 model_name, assessment, result, answer, time_taken = future.result()
-                print(model_name, assessment["file_name"], result, answer, time_taken)
+                # print(model_name, assessment["file_name"], result, answer, time_taken)
                 if result is None:
                     # print(
                     #     f"Skipping {model_name} for {assessment['file_name']} as no result is returned"
@@ -468,7 +497,7 @@ def main():
             "total": total,
             "correct": correct,
             "percentage": round(correct / total * 100, 1),
-            "logo": logos[model_name],
+            "logo": logos.get(model_name, ""),
             "average_time": f"{sum(times_by_model[model_name]) / len(times_by_model[model_name]):.2f}s",
         }
 
@@ -550,8 +579,11 @@ def main():
             result["position"] = model_results_list[i - 1]["position"] + 1
 
     # print(new_models)
-    with open("./model_results.json", "r") as file:
-        saved_results = orjson.loads(file.read())
+    saved_results = model_results.copy()
+    # with open("model_results.json", "w+") as file:
+    #     file.write(json.dumps(model_results, indent=4))
+    # with open("./model_results.json", "r") as file:
+    #     saved_results = orjson.loads(file.read())
     # print(saved_results['added_on'])
     # new models should have datetime added as today
     seven_days_ago = (datetime.date.today() - datetime.timedelta(days=7)).isoformat()
@@ -601,7 +633,7 @@ def main():
                     * 100,
                     1,
                 ),
-                "logo": logos[model_name],
+                "logo": logos.get(model_name, ""),
                 "average_time": average_times_by_model[model_name],
             }
             for model_name, results in filtered_assessments_by_model.items()
@@ -713,7 +745,7 @@ def main():
                     passed=sum(1 for result in results if result["correct"]),
                     failed=sum(1 for result in results if not result["correct"]),
                     total=len(results),
-                    logo=logos[model_name],
+                    logo=logos.get(model_name, ""),
                     by_category_results=result_assessments_by_model_by_category[model_name],
                     average_time=average_times_by_model[model_name],
                     title=f"{model_name} Results - Vision AI Checkup",
@@ -748,14 +780,15 @@ def main():
         
     saved_results = delete_bytes(saved_results)
 
-    with open("model_results.json", "r") as file:
-        m_results = orjson.loads(file.read())
+    if os.path.exists("model_results.json"):
+        with open("model_results.json", "r+") as file:
+            m_results = orjson.loads(file.read())
 
-    if not m_results.get("added_on"):
-        june_first = datetime.datetime(2025, 6, 1).isoformat()
-        saved_results["added_on"] = {model_name: june_first for model_name in assessments_by_model.keys()}
-    else:
-        saved_results["added_on"] = m_results.get("added_on", {})
+        if not m_results.get("added_on"):
+            june_first = datetime.datetime(2025, 6, 1).isoformat()
+            saved_results["added_on"] = {model_name: june_first for model_name in assessments_by_model.keys()}
+        else:
+            saved_results["added_on"] = m_results.get("added_on", {})
 
     # for model in new_models:
     #     if model[0] not in saved_results["added_on"]:
