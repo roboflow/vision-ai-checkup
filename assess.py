@@ -157,8 +157,6 @@ def main():
         "OpenAI O4 Mini (High Reasoning)": "https://openai.com/favicon.ico",
         "OpenAI O3 (High Reasoning)": "https://openai.com/favicon.ico",
         "OpenAI O3 (Medium Reasoning)": "https://openai.com/favicon.ico",
-        "ChatGPT-4o (Medium Reasoning)": "https://openai.com/favicon.ico",
-        "ChatGPT-4o (High Reasoning)": "https://openai.com/favicon.ico",
         "OpenAI O1 Pro": "https://openai.com/favicon.ico",
         "GPT-4.1 Mini": "https://openai.com/favicon.ico",
         "GPT-4.1 Nano": "https://openai.com/favicon.ico",
@@ -261,6 +259,8 @@ def main():
         with open("./model_results.json", "r") as file:
             final_results = orjson.loads(file.read())
 
+        # Legacy normalization removed per request; load raw results as-is.
+
         model_providers = {
             "OpenAI O4 Mini": "",
             "GPT-4.1": "",
@@ -320,8 +320,8 @@ def main():
             "OpenAI O4 Mini (Medium Reasoning)": OpenAIModel(model_id="o4-mini"),
             "OpenAI O3 (Medium Reasoning)": OpenAIModel(model_id="o3"),
             "GPT-4.1": OpenAIModel(model_id="gpt-4.1"),
-            "ChatGPT-4o (Medium Reasoning)": OpenAIModel(model_id="chatgpt-4o-latest"),
-            "ChatGPT-4o (High Reasoning)": OpenAIModel(model_id="chatgpt-4o-latest", reasoning_effort="high"),
+            # 4o is not a reasoning model; expose a single canonical name without reasoning level.
+            "ChatGPT-4o": OpenAIModel(model_id="chatgpt-4o-latest"),
             "GPT-4.1 Mini": OpenAIModel(model_id="gpt-4.1-mini"),
             "GPT-4.1 Nano": OpenAIModel(model_id="gpt-4.1-nano"),
             "OpenAI O1": OpenAIModel(model_id="o1"),
