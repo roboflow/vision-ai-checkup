@@ -52,17 +52,17 @@ Then:
 
 1. Add the image you want to use in your assessment to the `images` folder.
 2. Add an entry to the `prompts.csv` file with:
-    - The file name (`file_name`).
-    - The prompt to use (`prompt`).
-    - The correct answer (`answer`).
-    - A name for the assessment (`assessment_name`).
-    - A category for the assessment. If possible, choose an existing category. If your assessment requires a new category, please note why this makes sense in your PR description.
-    - Your name (`submitted_by`).
-    - A URL you want to link to (`submitted_by_link`).
+   - The file name (`file_name`).
+   - The prompt to use (`prompt`).
+   - The correct answer (`answer`).
+   - A name for the assessment (`assessment_name`).
+   - A category for the assessment. If possible, choose an existing category. If your assessment requires a new category, please note why this makes sense in your PR description.
+   - Your name (`submitted_by`).
+   - A URL you want to link to (`submitted_by_link`).
 3. File a PR.
 
 > [!WARNING]
-> 
+>
 > Images must be no more than 2MB. This will ensure that your image is not too big to be run through supported APIs.
 
 ### Add a Model
@@ -90,6 +90,7 @@ To add support for a new vendor/model provider:
 1. Create a new file in the `models` directory (e.g., `models/your_vendor.py`).
 
 2. Create a class that inherits from the base `Model` class:
+
    ```python
    from .model import Model
 
@@ -106,13 +107,13 @@ To add support for a new vendor/model provider:
            # - prompt: The text prompt to send with the image
            # - image_name: Optional filename for logging
            # - structured_output_format: Optional format string for structured output
-           
+
            # Your implementation should:
            # 1. Prepare the image and prompt for your vendor's API
            # 2. Make the API call
            # 3. Process the response
            # 4. Return the model's text response
-           
+
            # Example:
            # response = your_vendor_api_call(image, prompt)
            # return response.text
@@ -120,6 +121,7 @@ To add support for a new vendor/model provider:
    ```
 
 3. Add your model to the `model_providers` dictionary in `assess.py`:
+
    ```python
    from models.your_vendor import YourVendorModel
 
@@ -152,6 +154,7 @@ Your model implementation should:
 - Log appropriate information for debugging
 
 See the existing model implementations in the `models` directory for examples:
+
 - `models/openai.py` for OpenAI models
 - `models/anthropic.py` for Anthropic models
 - `models/gemini.py` for Google's Gemini models
@@ -160,6 +163,32 @@ See the existing model implementations in the `models` directory for examples:
 ### Bugs, other changes
 
 If you notice any bugs or see improvements that can be made to the assessment code or website, please create an Issue so we can discuss the changes before you start work.
+
+## Serve Locally
+
+Install dependencies:
+
+```
+npm install
+```
+
+Build the site:
+
+```
+npm run prod
+```
+
+Or:
+
+```
+npm run build
+```
+
+Serve the site:
+
+```
+cd docs/ && python3 -m http.server 8000
+```
 
 ## License
 
