@@ -91,6 +91,7 @@ open_or_closed_source = {
     "Mistral Small 3.1 24B": "open",
     "Gemma 3 4B": "open",
     "GPT-5.1": "closed",
+    "GPT-5.2": "closed",
     "Phi 4 Multimodal": "closed",
     "Gemini 1.5 Flash": "closed",
     "Gemini 1.5 Pro": "closed",
@@ -153,6 +154,7 @@ def main():
         "GPT-5 (high reasoning)": "https://openai.com/favicon.ico",
         "GPT-5": "https://openai.com/favicon.ico",
         "GPT-5.1": "https://openai.com/favicon.ico",
+        "GPT-5.2": "https://openai.com/favicon.ico",
         "GPT-5 Mini": "https://openai.com/favicon.ico",
         "GPT-5 Nano": "https://openai.com/favicon.ico",
         "GPT-5 Chat": "https://openai.com/favicon.ico",
@@ -283,6 +285,7 @@ def main():
             "GPT-5 (high reasoning)": "",
             "GPT-5": "",
             "GPT-5.1": "",
+            "GPT-5.2": "",
             "GPT-5 Mini": "",
             "GPT-5 Nano": "",
             "GPT-5 Chat": "",
@@ -319,6 +322,7 @@ def main():
     else:
         model_providers = {
             "GPT-5.1": OpenAIModel(model_id="gpt-5.1"),
+            "GPT-5.2": OpenAIModel(model_id="gpt-5.2"),
             "Claude 4 Sonnet": AnthropicModel(model_id="claude-sonnet-4-20250514"),
             "Claude 4 Opus": AnthropicModel(model_id="claude-opus-4-20250514"),
             "Claude 4.1 Opus": AnthropicModel(model_id="claude-opus-4-1-20250805"),
