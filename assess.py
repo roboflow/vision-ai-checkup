@@ -78,6 +78,7 @@ open_or_closed_source = {
     "Gemini 2.0 Flash": "closed",
     "Gemini 2.0 Flash Lite": "closed",
     "Gemini 2.5 Flash Preview": "closed",
+    "Gemini 3 Flash": "closed",
     "Gemini 2.5 Flash-Lite Preview": "closed",
     "Gemini 3 Pro Preview": "closed",
     "Cohere Aya Vision 8B": "closed",
@@ -175,6 +176,7 @@ def main():
         "Claude 3.5 Haiku": "https://www.anthropic.com/favicon.ico",
         "Gemini 2.5 Pro": "https://www.google.com/favicon.ico",
         "Gemini 2.0 Flash": "https://www.google.com/favicon.ico",
+        "Gemini 3 Flash": "https://www.google.com/favicon.ico",
         "Gemini 2.0 Flash Lite": "https://www.google.com/favicon.ico",
         "Gemini 2.5 Flash Lite": "https://www.google.com/favicon.ico",
         "Gemma 3 27b": "https://www.google.com/favicon.ico",
@@ -362,6 +364,7 @@ def main():
             "Gemini 2.5 Flash": GeminiModel(model_id="gemini-2.5-flash"),
             "Gemini 2.5 Flash Lite": GeminiModel(model_id="gemini-2.5-flash-lite"),
             "Gemini 2.5 Pro": GeminiModel(model_id="gemini-2.5-pro"),
+            "Gemini 3 Flash": GeminiModel(model_id="gemini-3-flash-preview"),
             "Gemini 3 Pro Preview": GeminiModel(model_id="gemini-3-pro-preview"),
             "Cohere Aya Vision 8B": CohereModel(model_id="c4ai-aya-vision-8b"),
             "Cohere Aya Vision 32B": CohereModel(model_id="c4ai-aya-vision-32b"),
@@ -925,7 +928,7 @@ def main():
                     * 100,
                     1,
                 ),
-                "avg_time": f"{sum(float(result["time_taken"].replace("s", "")) for result in model1_results) / (len(model1_results) or 1):.2f}s"
+                "avg_time": f"{sum(float(result['time_taken'].replace('s', '')) for result in model1_results) / (len(model1_results) or 1):.2f}s"
             }
 
             by_category_results[category]["model2"] = {
@@ -940,7 +943,7 @@ def main():
                     * 100,
                     1,
                 ),
-                "avg_time": f"{sum(float(result["time_taken"].replace("s", "")) for result in model2_results) / (len(model2_results) or 1):.2f}s",
+                "avg_time": f"{sum(float(result['time_taken'].replace('s', '')) for result in model2_results) / (len(model2_results) or 1):.2f}s",
             }
 
         # create a compare page for each model combination
