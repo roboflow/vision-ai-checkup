@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "build": "tailwindcss -i ./assets/css/input.css -o ./docs/css/output.css --watch --watch-dir ./templates",
+    "dev": "python3 assess.py --incremental --build-only && npm run prod && cd docs && python3 -m http.server 8000",
+    "watch": "tailwindcss -i ./assets/css/input.css -o ./docs/css/output.css --watch --watch-dir ./templates",
     "prod": "tailwindcss -i ./assets/css/input.css -o ./docs/css/output.css --minify"
   },
   "devDependencies": {

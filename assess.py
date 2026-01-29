@@ -1,7 +1,12 @@
 import concurrent.futures
 import csv
 import orjson
+from dotenv import load_dotenv
+
+load_dotenv()
+
 import os
+import glob
 import shutil
 import json
 import string
@@ -41,6 +46,20 @@ def parse_args():
         default=False,
         help="Watch for changes in the directory and update the docs incrementally.",
     )
+    # build only (skip inference)
+    parser.add_option(
+        "--build-only",
+        action="store_true",
+        dest="build_only",
+        default=False,
+        help="Only build the documentation, skip inference.",
+    )
+    parser.add_option(
+        "--model",
+        dest="model",
+        default=None,
+        help="Run only the specified model (partial match allowed).",
+    )
     options, _ = parser.parse_args()
     return options
 
@@ -49,6 +68,9 @@ options = parse_args()
 if options.incremental:
     is_in_incremental_mode = True
     print("Running in incremental mode. Only changed files will be updated.")
+
+if options.build_only:
+    print("Running in build-only mode. Skipping inference.")
 
 if os.path.exists("docs"):
     shutil.rmtree("docs")
@@ -79,6 +101,7 @@ open_or_closed_source = {
     "Gemini 2.0 Flash Lite": "closed",
     "Gemini 2.5 Flash Preview": "closed",
     "Gemini 3 Flash": "closed",
+    "Gemini 3 Flash (Tools)": "closed",
     "Gemini 2.5 Flash-Lite Preview": "closed",
     "Gemini 3 Pro Preview": "closed",
     "Cohere Aya Vision 8B": "closed",
@@ -177,6 +200,7 @@ def main():
         "Gemini 2.5 Pro": "https://www.google.com/favicon.ico",
         "Gemini 2.0 Flash": "https://www.google.com/favicon.ico",
         "Gemini 3 Flash": "https://www.google.com/favicon.ico",
+        "Gemini 3 Flash (Tools)": "https://www.google.com/favicon.ico",
         "Gemini 2.0 Flash Lite": "https://www.google.com/favicon.ico",
         "Gemini 2.5 Flash Lite": "https://www.google.com/favicon.ico",
         "Gemma 3 27b": "https://www.google.com/favicon.ico",
@@ -201,14 +225,94 @@ def main():
         "Phi 4 Multimodal": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/Microsoft_logo.svg/1024px-Microsoft_logo.svg.png?20210729021049",
     }
 
+
     def normalise_output(output):
         if not output:
             return ""
 
-        output = output.strip().lower()
+        output = str(output).strip().lower()
         output = output.translate(str.maketrans("", "", string.punctuation))
 
         return output.strip().replace(" ", "")
+
+    def compare_json_values(val1, val2):
+        """
+        Recursively compare two values.
+        - If both are dicts, compare keys and values.
+        - If both are lists, compare elements (assuming order matters for now).
+        - If strings, use normalise_output.
+        - Otherwise, use equality.
+        """
+        type1 = type(val1)
+        type2 = type(val2)
+
+        if isinstance(val1, dict) and isinstance(val2, dict):
+            if set(val1.keys()) != set(val2.keys()):
+                return False
+            for k in val1:
+                if not compare_json_values(val1[k], val2[k]):
+                    return False
+            return True
+        
+        elif isinstance(val1, list) and isinstance(val2, list):
+            if len(val1) != len(val2):
+                return False
+            for v1, v2 in zip(val1, val2):
+                if not compare_json_values(v1, v2):
+                    return False
+            return True
+        
+        elif isinstance(val1, str) or isinstance(val2, str):
+            # If one is string and other is not, they might still match (e.g. "12" vs 12)
+            # But the user specifically asked for JSON comparison where types normally imply strictness?
+            # However, looking at "total_pieces": 12 vs "12", robust comparison is better.
+            return normalise_output(val1) == normalise_output(val2)
+        
+        else:
+            return val1 == val2
+
+    def compare_outputs(predicted_str, ground_truth_str):
+        # Check if ground_truth looks like JSON
+        gt_is_json = False
+        if isinstance(ground_truth_str, str):
+            clean_gt = ground_truth_str.strip()
+            # Replace curly quotes with straight quotes for JSON parsing
+            clean_gt = clean_gt.replace("“", '"').replace("”", '"')
+            if clean_gt.startswith("{") and clean_gt.endswith("}"):
+                gt_is_json = True
+                # Update ground_truth_str to clean version for parsing
+                ground_truth_str = clean_gt
+        
+        if gt_is_json:
+            try:
+                # Parse GT
+                # It might be in the CSV using single quotes or something?
+                # The code below uses 'answer' from CSV. 
+                # Let's try parsing.
+                # Note: CSV string might have escaped quotes.
+                gt_json = json.loads(ground_truth_str)
+                
+                # Parse Predicted
+                # 'predicted_str' corresponds to 'parsed_answer' which is a stringified result or already extracted answer.
+                # In the loop: parsed_answer = str(result.get("answer", result))
+                # So we need to re-parse it if possible.
+                try:
+                    pred_json = json.loads(predicted_str)
+                except:
+                    # If predicted cannot be parsed as JSON but GT is JSON, it is incorrect.
+                    # Unless predicted matches strictly string-wise?
+                    # Let's double check if we can parse strict or loose.
+                    # As fallback, we return normal comparison.
+                    return normalise_output(predicted_str) == normalise_output(ground_truth_str)
+                
+                return compare_json_values(pred_json, gt_json)
+                
+            except Exception as e:
+                # If GT fails to parse, fallback to string comparison
+                pass
+
+        return normalise_output(predicted_str) == normalise_output(ground_truth_str)
+
 
 
     with open("prompts.csv", "r") as file:
@@ -236,8 +340,9 @@ def main():
 
         result = model.run_with_retry(
             assessment["image"],
-            assessment["prompt"],
+            assessment["prompt"] + '\nReturn the result in JSON format, e.g. {"answer": "your answer"}.',
             image_name=os.path.join(BASE_IMAGE_DIR, assessment["file_name"]),
+            structured_output_format={"type": "json_object"}
         )
         # if result is none, try on compressed
         if result is None:
@@ -248,8 +353,9 @@ def main():
                 assessment["image"] = image_file.read()
             result = model.run_with_retry(
                 assessment["image"],
-                assessment["prompt"],
+                assessment["prompt"] + '\nReturn the result in JSON format, e.g. {"answer": "your answer"}.',
                 image_name=os.path.join(BASE_IMAGE_DIR, "compressed/", assessment["file_name"].replace(".png", ".jpeg")),
+                structured_output_format={"type": "json_object"}
             )
 
         end_time = time.time()
@@ -264,10 +370,30 @@ def main():
 
     times_by_model = defaultdict(list)
 
-    # if model_results.json exists, load it instead of running the models again
-    if os.path.exists("./model_results.json") and not is_in_incremental_mode:
-        with open("./model_results.json", "r") as file:
-            final_results = orjson.loads(file.read())
+    # if data/results directory exists, load results from there
+    added_on = {}
+    if os.path.exists("data/results") and not is_in_incremental_mode:
+        for file_path in glob.glob("data/results/result_*.json"):
+            with open(file_path, "r") as f:
+                data = json.load(f)
+                # data is expected to be {"model_name": "...", "assessments": {...}}
+                # handle both legacy format (if any) and new format
+                if "model_name" in data:
+                    m_name = data["model_name"]
+                    assessments_by_model[m_name] = data["assessments"]
+                else:
+                    # fallback if no model_name, though we migrated with it
+                    # try to infer from filename? No, we enforced it in migration.
+                    # skipping unknown format or assuming it is just assessments dict
+                    pass
+        
+        # Load metadata
+        if os.path.exists("data/metadata.json"):
+            with open("data/metadata.json", "r") as f:
+                metadata = json.load(f)
+                added_on = metadata.get("added_on", {})
+
+        model_results = {} # will be recalculated
 
         model_providers = {
             "OpenAI O4 Mini": "",
@@ -310,14 +436,18 @@ def main():
             "Arcee.ai Spotlight": "",
             "OpenAI o3-pro": "",
         }
-        # load from saved_results
-        assessments_by_model = final_results["assessments_by_model"]
-        model_results = final_results["model_results"]
-
-        assessments = final_results["assessments"]
-
-        assessment_categories = list(set([i["category"] for i in assessments]))
-        assessment_categories.sort()
+        
+        # assessments = final_results["assessments"] 
+        # Wait, final_results["assessments"] was from the loaded json.
+        # But we also load assessments from prompts.csv at line 216.
+        # We should use the one from CSV as the source of truth for assessments list.
+        # The loaded results provide the 'results' for each model.
+        
+        # The original code loaded 'final_results' which allowed caching 'assessments' list too?
+        # But line 218 'assessments = list(reader)' loads from CSV.
+        # original line 319: assessments = final_results["assessments"] overwrites it?
+        # If so, we should stick to CSV assessments.
+        
         for model_name, results in assessments_by_model.items():
             for assessment in results.values():
                 times_by_model[model_name].append(float(assessment["time_taken"].replace("s", "")))
@@ -349,7 +479,7 @@ def main():
                 base_url="https://router.huggingface.co/v1",
                 api_key=os.environ.get("HUGGINGFACE_API_KEY"),
             ),
-            "OpenAI o3-pro": OpenAIModel(model_id="o3-pro"),
+            # "OpenAI o3-pro": OpenAIModel(model_id="o3-pro"),
             "Claude 3.7 Sonnet": AnthropicModel(model_id="claude-3-7-sonnet-20250219"),
             "Claude 3.5 Haiku": AnthropicModel(model_id="claude-3-5-haiku-20241022"),
             "Gemini 1.5 Flash": GeminiModel(model_id="gemini-1.5-flash"),
@@ -365,6 +495,7 @@ def main():
             "Gemini 2.5 Flash Lite": GeminiModel(model_id="gemini-2.5-flash-lite"),
             "Gemini 2.5 Pro": GeminiModel(model_id="gemini-2.5-pro"),
             "Gemini 3 Flash": GeminiModel(model_id="gemini-3-flash-preview"),
+            "Gemini 3 Flash (Tools)": GeminiModel(model_id="gemini-3-flash-preview", enable_code_execution=True),
             "Gemini 3 Pro Preview": GeminiModel(model_id="gemini-3-pro-preview"),
             "Cohere Aya Vision 8B": CohereModel(model_id="c4ai-aya-vision-8b"),
             "Cohere Aya Vision 32B": CohereModel(model_id="c4ai-aya-vision-32b"),
@@ -406,13 +537,25 @@ def main():
         }
 
         if is_in_incremental_mode:
-            with open("./model_results.json", "r") as file:
-                final_results = orjson.loads(file.read())
-
-            calculated_models = set(final_results["model_results"].keys())
-            # load from saved_results
-            assessments_by_model = final_results["assessments_by_model"]
-            model_results = final_results["model_results"]
+            # Load results from data/results
+            if os.path.exists("data/results"):
+                # verify docs/images exists
+                os.makedirs(os.path.join(OUTPUT_DIR, "images"), exist_ok=True)
+                
+                for file_path in glob.glob("data/results/result_*.json"):
+                    with open(file_path, "r") as f:
+                        data = json.load(f)
+                        if "model_name" in data:
+                            m_name = data["model_name"]
+                            assessments_by_model[m_name] = data["assessments"]
+            
+             # Load metadata
+            if os.path.exists("data/metadata.json"):
+                with open("data/metadata.json", "r") as f:
+                    metadata = json.load(f)
+                    added_on = metadata.get("added_on", {})
+            
+            calculated_models = set(assessments_by_model.keys())
 
             # assessments = final_results["assessments"]
 
@@ -423,6 +566,17 @@ def main():
                     times_by_model[model_name].append(float(assessment["time_taken"].replace("s", "")))
 
         models_to_run = [(model_name, model_class) for model_name, model_class in model_providers.items()]
+
+        if options.model:
+            import re
+            models_to_run = [
+                (model_name, model_class)
+                for model_name, model_class in models_to_run
+                if re.search(options.model, model_name, re.IGNORECASE)
+            ]
+
+        if options.build_only:
+            models_to_run = []
 
         if is_in_incremental_mode:
             # filter models to run based on the ones that have not been calculated yet
@@ -462,7 +616,7 @@ def main():
         #     if len(images_to_run_by_model[model_name]) > 0
         # ]
 
-        with concurrent.futures.ThreadPoolExecutor(max_workers=20) as executor:
+        with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
             futures = [
                 executor.submit(run_model_with_prompt, model_name, model_class, assessment)
                 for model_name, model_class in models_to_run
@@ -485,18 +639,51 @@ def main():
                     continue
                 times_by_model[model_name].append(time_taken)
 
+                try:
+                    # try to parse json
+                    if isinstance(result, dict):
+                        val = result.get("answer", result)
+                        if isinstance(val, (dict, list)):
+                            parsed_answer = json.dumps(val)
+                        else:
+                            parsed_answer = str(val)
+                    elif isinstance(result, str):
+                        # clean up markdown code blocks if present
+                        if "```json" in result:
+                            result = result.split("```json")[1].split("```")[0].strip()
+                        elif "```" in result:
+                            result = result.split("```")[1].split("```")[0].strip()
+                        
+                        parsed = json.loads(result)
+                        val = parsed.get("answer", parsed)
+                        if isinstance(val, (dict, list)):
+                            parsed_answer = json.dumps(val)
+                        else:
+                            parsed_answer = str(val)
+                    else:
+                        parsed_answer = str(result)
+                except Exception as e:
+                    # fallback
+                    print(f"Failed to parse result for {model_name} on {assessment['file_name']}: {e}")
+                    # print(f"Raw Result: {result}")
+                    parsed_answer = str(result)
+
+                # payload["result"] = result 
+                # keep original result (JSON string) for debug/storage? 
+                # The user "fix current code to use this per-model json".
+                # The prompt output is JSON.
+                
                 payload = {
-                    "result": result,
+                    "result": result if isinstance(result, (dict, list)) else result, # Store dict/list directly if needed, or string
                     "answer": answer,
+                    "parsed_answer": parsed_answer, # Store parsed answer for verification visibility
                     "file_name": assessment["file_name"],
                     "time_taken": f"{time_taken:.2f}s",
                     **assessment,
                 }
 
-                payload["correct"] = normalise_output(result) == normalise_output(answer) or (
-                    len(normalise_output(result)) > 1
-                    and normalise_output(answer) in normalise_output(result)
-                )
+                # Strict checking
+                payload["correct"] = compare_outputs(parsed_answer, answer)
                 if not assessments_by_model.get(model_name):
                     assessments_by_model[model_name] = {}
 
@@ -795,22 +982,35 @@ def main():
         
     saved_results = delete_bytes(saved_results)
 
-    if os.path.exists("model_results.json"):
-        with open("model_results.json", "r+") as file:
-            m_results = orjson.loads(file.read())
+    
+    # Save Metadata
+    # if os.path.exists("data/metadata.json"):
+    #     with open("data/metadata.json", "r") as file:
+    #         metadata = json.load(file)
+    # else:
+    #     metadata = {}
+    
+    # Check added_on
+    if not added_on:
+         june_first = datetime.datetime(2025, 6, 1).isoformat()
+         added_on = {model_name: june_first for model_name in assessments_by_model.keys()}
+    
+    # saved_results was originally wrapping everything.
+    # WE do not need saved_results monolithic object anymore, but we need to check if we write metadata
+    with open("data/metadata.json", "w") as file:
+        json.dump({"added_on": added_on}, file, indent=4)
 
-        if not m_results.get("added_on"):
-            june_first = datetime.datetime(2025, 6, 1).isoformat()
-            saved_results["added_on"] = {model_name: june_first for model_name in assessments_by_model.keys()}
-        else:
-            saved_results["added_on"] = m_results.get("added_on", {})
-
-    # for model in new_models:
-    #     if model[0] not in saved_results["added_on"]:
-    #         saved_results["added_on"][model[0]] = datetime.now().isoformat()
-
-    with open("model_results.json", "w") as file:
-        file.write(json.dumps(saved_results, indent=4))
+    # Save each model result
+    for model_name, results in assessments_by_model.items():
+        slug = slugify(model_name)
+        file_path = f"data/results/result_{slug}.json"
+        
+        file_content = {
+            "model_name": model_name,
+            "assessments": results
+        }
+        with open(file_path, "w") as file:
+             json.dump(file_content, file, indent=4)
 
     for assessment in assessments:
         src = os.path.join(BASE_IMAGE_DIR, assessment["file_name"])
@@ -1043,12 +1243,14 @@ class TemplateChangeHandler(FileSystemEventHandler):
 
 if __name__ == "__main__":
     main()
-    # if --watch flag is set, watch for changes in the templates directory
+    # if --watch flag is set, watch for changes in the templates directory and data/results
     if "--watch" in os.sys.argv:
         event_handler = TemplateChangeHandler()
         observer = Observer()
         observer.schedule(event_handler, path="templates/", recursive=True)
-        print("Watching for changes in templates directory...")
+        if os.path.exists("data/results"):
+            observer.schedule(event_handler, path="data/results/", recursive=False)
+        print("Watching for changes in templates and data/results directories...")
         observer.start()
         try:
             while True:
