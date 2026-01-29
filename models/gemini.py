@@ -27,8 +27,9 @@ def parse_json(json_output: str):
 
 
 class GeminiModel(Model):
-    def __init__(self, model_id: str):
+    def __init__(self, model_id: str, enable_code_execution: bool = False):
         self.model_id = model_id
+        self.enable_code_execution = enable_code_execution
         self.client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
 
     def run(
@@ -42,6 +43,8 @@ class GeminiModel(Model):
             model=self.model_id,
             config=types.GenerateContentConfig(
                 temperature=GEMINI_TEMPERATURE,
+                tools=[types.Tool(code_execution=types.ToolCodeExecution)] if self.enable_code_execution else None,
+                response_mime_type="application/json" if structured_output_format else "text/plain",
             ),
             contents=[
                 prompt,

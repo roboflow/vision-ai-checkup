@@ -1,6 +1,6 @@
 file_name,prompt,answer,assessment_name,category,submitted_by,submitted_by_link,
 glass.png,Is the glass rim cracked? Answer only yes or no.,Yes,Glass rim crack,Defect Detection,Roboflow,https://roboflow.com,
-measurement.png,How wide is the sticker in inches? Return only a real number.,3.5,Measure a sticker,Object Measurement,Roboflow,https://roboflow.com,
+measurement.png,"How wide is the sticker in inches? Return only a real number with 1 decimal value, like “12.3” for 12.3 inches",3.5,Measure a sticker,Object Measurement,Roboflow,https://roboflow.com,
 bottles.png,How many bottles are in the image? Answer only a number,27,Count bottles,Object Counting,Roboflow,https://roboflow.com,
 date_picker.png,What date is picked on the calendar? Answer like January 1 2020,November 21 2017,Date picker,Web Action Understanding,Roboflow,https://roboflow.com,
 receipt.png,How much tax was paid? Only answer like $1.00,$2.30,Read a receipt,Receipt Reading,Roboflow,https://roboflow.com,
@@ -36,7 +36,7 @@ receipt_subtotal_tear.png,What is the subtotal of the receipt? Return only the a
 table_understanding.png,What is the adjusted EBITDA in the nine months ended September 2023 (in millions)?,"2,428",Table understanding,Document Understanding,Roboflow,https://roboflow.com,
 robotic_arm_orientation.png,"Is the robotic arm grip pointing down, at a left angle, or at a right angle? Return down right or left.",down,Robotic arm grip orientation,Spatial Relations,Roboflow,https://roboflow.com,
 robotic_arm_orientation.png,Is there a person next to the robotic arm? Answer only yes or no.,Yes,Human proximity to robotic arm,Spatial Relations,Roboflow,https://roboflow.com,
-circuit_board.png,Read the number above the left transistor. Return only the number.,101,Circuit board understanding,Object Understanding,Roboflow,https://roboflow.com,
+circuit_board.png,"Read the number above the left transistor. Return only the component’s reference , like “C001” for some capacitor",Q101,Circuit board understanding,Object Understanding,Roboflow,https://roboflow.com,
 blurry_load_carriers.png,How many load carriers are in the image? Return only a number.,3,Object counting with a blurry image,Object Counting,Roboflow,https://roboflow.com,
 screenshot_web_catalog.png,"What is the package quantity of 90183A308? Return only a number. If SKU does not exist, return NULL.",50,(WIP) Table understanding from a web catalog,Document Understanding,Roboflow,https://roboflow.com,
 screenshot_web_catalog.png,"What is the package quantity of 90183A308? Return only a number. If SKU does not exist, return NULL.",NULL,Table understanding from a web catalog (SKU does not exist),Document Understanding,Roboflow,https://roboflow.com,
@@ -72,7 +72,7 @@ barcode_reading.png,What is the ID on the barcode? Return only the ID text.,T074
 epoch_flat.png,"At what epoch does the line start to flatten out? Return only the epoch number, like 99.",4,Point a line flattens on a graph,Document Understanding,Roboflow,https://roboflow.com,
 roast_date.png,"When was the coffee roasted? Return only the roast date in DD/MM/YYYY, like 01/12/2019.",08/09/2020,Roast date on a label,Document Understanding,Roboflow,https://roboflow.com,
 part_number.png,Return the part number.,10629101,Part number reading,OCR,Roboflow,https://roboflow.com,
-container_information_retrieval.png,What is the max gross weight?,"32,500 kg",Maximum gross weight label on shipping container,OCR,Roboflow,https://roboflow.com,
+container_information_retrieval.png,"What is the max gross weight? Return only number (value in KG), without separators/decimals, like “1234”",32500,Maximum gross weight label on shipping container,OCR,Roboflow,https://roboflow.com,
 complete_pallet.png,How many boxes are missing? Return only a number.,1,Missing boxes on pallet,Object Understanding,Roboflow,https://roboflow.com,
 metal_scratch.png,Is there a scratch on the metal? Return only yes or no.,Yes,Scratch on metal,Defect Detection,Roboflow,https://roboflow.com,
 tray_in_bag.png,Is the tray in a blue bag? Return only yes or no.,Yes,Tray in bag on assembly line,Defect Detection,Roboflow,https://roboflow.com,
@@ -92,9 +92,7 @@ sudoku.png,"You are given an image of a Sudoku puzzle. Your task is to detect an
 .7..6..4.
 ...2.7...",Sudoku puzzle extraction,Document Understanding,Roboflow,https://roboflow.com,
 biscuts.jpg,How many biscuts or cookies are there?,3,Count number of biscuts,Object Counting,SnehitVaddi,https://github.com/snehitvaddi,
-7-cube_t0.png,How many vertices (marked as red or orange dots) are visible in this diagram? Present your answer as an integer like 1.,127,Counting nodes,Object Counting,User,https://en.wikipedia.org/wiki/File:7-cube_t0.svg
+7-cube_t0.png,How many vertices (marked as red or orange dots) are visible in this diagram? Present your answer as an integer like 1.,127,Counting nodes,Object Counting,User,https://en.wikipedia.org/wiki/File:7-cube_t0.svg,
 music.png,"Who transcribed this sheet music, according to the document? Answer as only the name is presented on the document.",Otto Singer II,Find an author,Document Understanding,User,,
 transcript.png,Find the total credits in fall 2015/16 in the attached school transcript,12,Total Credits in Fall 2015,Document Understanding,Jayesh,https://github.com/jayeshvpatil,
-chessboard_1.png,"Analyse the chessboard image and answer the following questions. 1. How many pieces are on the board? Provide only the number. Then, list the count of each piece type on the board by colour (W for White, B for Black) and importance (points worth: K for King, Q for Queen, R for Rook, B for Bishop, N for Knight, P for Pawn). Use the format WQ: 0 (meaning no White Queen), with one piece type per line. Separate the number of pieces and the piece list with a blank line. 2. Are any pieces in positions that violate standard chess rules? If so, list ONLY their positions in the format where column 'a' is the leftmost, 'h' is the rightmost, row 1 is the bottom row, and row 8 is the top row (e.g., b7,h1,h2, with multiple positions separated by a comma without spaces). If no pieces are in illegal positions, write “None.” Please write the question number before giving an answer for each of the questions.","12 WK: 1 WQ: 1 WR: 1 WB: 1 WN: 1 WP: 1 BK: 1 BQ: 1 BR: 1 BB: 1 BN: 1 BP: 1
-
-2.	e3,e4",Chessboard Analysis 1,Object Understanding,Joshua,https://github.com/jalliet,
+chessboard_1.png,"Analyse the chessboard image and answer the following questions. First task: how many pieces are on the board? Provide only the number. Second task: list the count of each piece type on the board by colour (W for White, B for Black) and importance (points worth: K for King, Q for Queen, R for Rook, B for Bishop, N for Knight, P for Pawn). Use the format “WQ”: 0 (meaning no White Queen). Third task: are any pieces in positions that violate standard chess rules? If so, list ONLY their positions in the format where column 'a' is the leftmost, 'h' is the rightmost, row 1 is the bottom row, and row 8 is the top row (e.g., b7,h1,h2, with multiple positions separated by a comma without spaces). If no pieces are in illegal positions, write “None.”. Output in JSON, in a format like this: {“total_pieces”:3, “pieces”:{“WK”:0, “WQ”:1},”illegal_pieces”:”a1,b2”}","{“total_pieces"":12,""pieces"":{""WK"":1,""WQ"":1,""WR"":1,""WB"":1,""WN"":1,""WP"":1,""BK"":1,""BQ"":1,""BR"":1,""BB"":1,""BN"":1,""BP"":1},""illegal_pieces"":""e3,e4""}",Chessboard Analysis 1,Object Understanding,Joshua,https://github.com/jalliet,
