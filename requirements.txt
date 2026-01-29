@@ -8,3 +8,4 @@ orjson
 supervision
 tqdm
 numpy
+python-dotenv
