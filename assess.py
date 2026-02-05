@@ -25,9 +25,12 @@ import optparse
 
 is_in_incremental_mode = False
 
-with open("models.csv", "r") as file:
-    reader = csv.DictReader(file)
-    model_info = list(reader)
+try:
+    with open("models.csv", "r") as file:
+        reader = csv.DictReader(file)
+        model_info = list(reader)
+except FileNotFoundError:
+    model_info = []
 
 def parse_args():
     parser = optparse.OptionParser()
@@ -121,6 +124,7 @@ open_or_closed_source = {
     "Gemini 1.5 Pro": "closed",
     "Llama 4 Maverick 17B": "closed",
     "Claude 4 Opus": "closed",
+    "Claude 4.6 Opus": "closed",
     "OpenAI O3": "closed",
     "OpenAI o3-pro": "closed",
 }
@@ -129,6 +133,7 @@ models_in_playground = set([
     "Qwen 2.5 VL 7B",
     "Claude 4 Sonnet",
     "Claude 4 Opus",
+    "Claude 4.6 Opus",
     "Claude 3.7 Sonnet",
     "Claude 3.5 Haiku",
     "Gemini 2.0 Flash",
@@ -210,6 +215,7 @@ def main():
         "Cohere Aya Vision 32B": "https://cohere.com/favicon.ico",
         "Claude 4 Sonnet": "https://www.anthropic.com/favicon.ico",
         "Claude 4 Opus": "https://www.anthropic.com/favicon.ico",
+        "Claude 4.6 Opus": "https://www.anthropic.com/favicon.ico",
         "Claude 4.1 Opus": "https://www.anthropic.com/favicon.ico",
         "Gemma 3n 4B": "https://www.google.com/favicon.ico",
         "Mistral Medium 3": "https://mistral.ai/favicon.ico",
@@ -457,6 +463,7 @@ def main():
             "GPT-5.2": OpenAIModel(model_id="gpt-5.2"),
             "Claude 4 Sonnet": AnthropicModel(model_id="claude-sonnet-4-20250514"),
             "Claude 4 Opus": AnthropicModel(model_id="claude-opus-4-20250514"),
+            "Claude 4.6 Opus": AnthropicModel(model_id="claude-opus-4-6", thinking_budget=16000),
             "Claude 4.1 Opus": AnthropicModel(model_id="claude-opus-4-1-20250805"),
             "OpenAI O4 Mini (High Reasoning)": OpenAIModel(model_id="o4-mini", reasoning_effort="high"),
             "OpenAI O3 (High Reasoning)": OpenAIModel(model_id="o3", reasoning_effort="high"),
@@ -616,7 +623,7 @@ def main():
         #     if len(images_to_run_by_model[model_name]) > 0
         # ]
 
-        with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
+        with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
             futures = [
                 executor.submit(run_model_with_prompt, model_name, model_class, assessment)
                 for model_name, model_class in models_to_run
