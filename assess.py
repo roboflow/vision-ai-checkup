@@ -123,8 +123,8 @@ open_or_closed_source = {
     "Claude 4.6 Opus": "closed",
     "OpenAI O3": "closed",
     "OpenAI o3-pro": "closed",
-    "GLM 4.6v": "closed",
-    "Kimi k2.5": "closed",
+    "GLM 4.6v": "open",
+    "Kimi k2.5": "open",
     "Qwen 3.5 Plus": "open",
     "Qwen 3.5 397B": "open",
 }
