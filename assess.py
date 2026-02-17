@@ -226,8 +226,8 @@ def main():
         "Phi 4 Multimodal": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/Microsoft_logo.svg/1024px-Microsoft_logo.svg.png?20210729021049",
         "Qwen 3.5 Plus": "https://cdn-avatars.huggingface.co/v1/production/uploads/620760a26e3b7210c2ff1943/-s1gyJfvbE1RgO5iBeNOi.png",
         "Qwen 3.5 397B": "https://cdn-avatars.huggingface.co/v1/production/uploads/620760a26e3b7210c2ff1943/-s1gyJfvbE1RgO5iBeNOi.png",
-        "GLM 4.6v": "images/z-icon.svg",
-        "Kimi k2.5": "images/kimi-icon.ico",
+        "GLM 4.6v": "/images/z-icon.svg",
+        "Kimi k2.5": "/images/kimi-icon.ico",
     }
 
 
