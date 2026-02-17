@@ -27,7 +27,7 @@ jobs:
           pip install -r requirements.txt
       - name: Build main site
         run: |
-          python assess.py
+          python assess.py --build-only
       - name: Set up npm
         uses: actions/setup-node@v3
         with:

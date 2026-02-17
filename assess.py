@@ -798,12 +798,6 @@ def main():
 
     # print(new_models)
     saved_results = model_results.copy()
-    # with open("model_results.json", "w+") as file:
-    #     file.write(json.dumps(model_results, indent=4))
-    # with open("./model_results.json", "r") as file:
-    #     saved_results = orjson.loads(file.read())
-    # print(saved_results['added_on'])
-    # new models should have datetime added as today
     seven_days_ago = (datetime.date.today() - datetime.timedelta(days=7)).isoformat()
     new_models = [model_name for model_name, date in saved_results.get("added_on", {}).items() if date > seven_days_ago]
 
