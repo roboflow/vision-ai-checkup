@@ -1,6 +1,5 @@
 import concurrent.futures
 import csv
-import orjson
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -117,16 +116,17 @@ open_or_closed_source = {
     "Gemma 3 1B": "open",
     "Mistral Small 3.1 24B": "open",
     "Gemma 3 4B": "open",
-    "GPT-5.1": "closed",
     "GPT-5.2": "closed",
     "Phi 4 Multimodal": "closed",
-    "Gemini 1.5 Flash": "closed",
-    "Gemini 1.5 Pro": "closed",
     "Llama 4 Maverick 17B": "closed",
     "Claude 4 Opus": "closed",
     "Claude 4.6 Opus": "closed",
     "OpenAI O3": "closed",
     "OpenAI o3-pro": "closed",
+    "GLM 4.6v": "closed",
+    "Kimi k2.5": "closed",
+    "Qwen 3.5 Plus": "open",
+    "Qwen 3.5 397B": "open",
 }
 
 models_in_playground = set([
@@ -137,8 +137,6 @@ models_in_playground = set([
     "Claude 3.7 Sonnet",
     "Claude 3.5 Haiku",
     "Gemini 2.0 Flash",
-    "Gemini 1.5 Flash",
-    "Gemini 1.5 Pro",
     "GPT-4.1",
     "GPT-4.1 Mini",
     "GPT-4.1 Nano",
@@ -153,6 +151,13 @@ def main():
     os.makedirs(os.path.join(OUTPUT_DIR, "prompts"), exist_ok=True)
     os.makedirs(os.path.join(OUTPUT_DIR, "images"), exist_ok=True)
     os.makedirs(os.path.join(OUTPUT_DIR, "assessments"), exist_ok=True)
+
+    # Copy local icons
+    if os.path.exists("assets/images/z-icon.svg"):
+        shutil.copy("assets/images/z-icon.svg", os.path.join(OUTPUT_DIR, "images", "z-icon.svg"))
+    if os.path.exists("assets/images/kimi-icon.ico"):
+        shutil.copy("assets/images/kimi-icon.ico", os.path.join(OUTPUT_DIR, "images", "kimi-icon.ico"))
+
 
 
     env = Environment(loader=FileSystemLoader("templates"))
@@ -175,25 +180,17 @@ def main():
 
     logos = {
         "Llama 3 11B Vision": "https://signsalad.com/wp-content/uploads/2021/11/Screenshot-2021-11-03-at-12.14.11.png",
-        "Llama 3 70B": "https://signsalad.com/wp-content/uploads/2021/11/Screenshot-2021-11-03-at-12.14.11.png",
         "Llama 4 Maverick 17B": "https://signsalad.com/wp-content/uploads/2021/11/Screenshot-2021-11-03-at-12.14.11.png",
         "Llama 4 Scout 17B": "https://signsalad.com/wp-content/uploads/2021/11/Screenshot-2021-11-03-at-12.14.11.png",
         "GPT-4.1": "https://openai.com/favicon.ico",
         "ChatGPT-4o": "https://openai.com/favicon.ico",
-        "GPT-5 (high reasoning)": "https://openai.com/favicon.ico",
-        "GPT-5": "https://openai.com/favicon.ico",
-        "GPT-5.1": "https://openai.com/favicon.ico",
         "GPT-5.2": "https://openai.com/favicon.ico",
         "GPT-5 Mini": "https://openai.com/favicon.ico",
         "GPT-5 Nano": "https://openai.com/favicon.ico",
         "GPT-5 Chat": "https://openai.com/favicon.ico",
-        "OpenAI O4 Mini (Medium Reasoning)": "https://openai.com/favicon.ico",
-        "OpenAI O4 Mini (High Reasoning)": "https://openai.com/favicon.ico",
-        "OpenAI O3 (High Reasoning)": "https://openai.com/favicon.ico",
-        "OpenAI O3 (Medium Reasoning)": "https://openai.com/favicon.ico",
-        "ChatGPT-4o (Medium Reasoning)": "https://openai.com/favicon.ico",
-        "ChatGPT-4o (High Reasoning)": "https://openai.com/favicon.ico",
         "OpenAI O1 Pro": "https://openai.com/favicon.ico",
+        "OpenAI O4 Mini (Medium Reasoning)": "https://openai.com/favicon.ico",
+        "ChatGPT-4o (Medium Reasoning)": "https://openai.com/favicon.ico",
         "GPT-4.1 Mini": "https://openai.com/favicon.ico",
         "GPT-4.1 Nano": "https://openai.com/favicon.ico",
         "OpenAI O3": "https://openai.com/favicon.ico",
@@ -223,12 +220,14 @@ def main():
         "Mistral Small 3.1 24b": "https://mistral.ai/favicon.ico",
         "Mistral Small 3.1 24B": "https://mistral.ai/favicon.ico",
         "Gemma 3 4B": "https://www.google.com/favicon.ico",
-        "Gemini 1.5 Flash": "https://www.google.com/favicon.ico",
-        "Gemini 1.5 Pro": "https://www.google.com/favicon.ico",
         "Gemini 3 Pro Preview": "https://www.google.com/favicon.ico",
         "OpenAI o3-pro": "https://openai.com/favicon.ico",
         "Arcee.ai Spotlight": "https://cdn.prod.website-files.com/6781a10424493fe352bc6cb5/678e92cb5d392e76c953e690_Favicon.png",
         "Phi 4 Multimodal": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/Microsoft_logo.svg/1024px-Microsoft_logo.svg.png?20210729021049",
+        "Qwen 3.5 Plus": "https://cdn-avatars.huggingface.co/v1/production/uploads/620760a26e3b7210c2ff1943/-s1gyJfvbE1RgO5iBeNOi.png",
+        "Qwen 3.5 397B": "https://cdn-avatars.huggingface.co/v1/production/uploads/620760a26e3b7210c2ff1943/-s1gyJfvbE1RgO5iBeNOi.png",
+        "GLM 4.6v": "images/z-icon.svg",
+        "Kimi k2.5": "images/kimi-icon.ico",
     }
 
 
@@ -416,13 +415,6 @@ def main():
             "Gemini 2.5 Flash Preview": "",
             "Gemini 3 Pro Preview": "",
             "Cohere Aya Vision 8B": "",
-            "GPT-5 (high reasoning)": "",
-            "GPT-5": "",
-            "GPT-5.1": "",
-            "GPT-5.2": "",
-            "GPT-5 Mini": "",
-            "GPT-5 Nano": "",
-            "GPT-5 Chat": "",
             "Cohere Aya Vision 32B": "",
             "Qwen 2.5 VL 7B": "",
             "Mistral Small 3.1 24b": "",
@@ -437,10 +429,15 @@ def main():
             "Mistral Small 3.1 24B": "",
             "Gemma 3 4B": "",
             "Phi 4 Multimodal": "",
-            "Gemini 1.5 Flash": "",
-            "Gemini 1.5 Pro": "",
             "Arcee.ai Spotlight": "",
             "OpenAI o3-pro": "",
+            "GLM 4.6v": "",
+            "Kimi k2.5": "",
+            "Qwen 3.5 Plus": "",
+            "GPT-5.2": "",
+            "GPT-5 Mini": "",
+            "GPT-5 Nano": "",
+            "Qwen 3.5 397B": "",
         }
         
         # assessments = final_results["assessments"] 
@@ -459,19 +456,17 @@ def main():
                 times_by_model[model_name].append(float(assessment["time_taken"].replace("s", "")))
     else:
         model_providers = {
-            "GPT-5.1": OpenAIModel(model_id="gpt-5.1"),
             "GPT-5.2": OpenAIModel(model_id="gpt-5.2"),
+            "GPT-5 Mini": OpenAIModel(model_id="gpt-5-mini"),
+            "GPT-5 Nano": OpenAIModel(model_id="gpt-5-nano"),
+            # "GPT-5 Chat": OpenAIModel(model_id="gpt-5-chat"),
             "Claude 4 Sonnet": AnthropicModel(model_id="claude-sonnet-4-20250514"),
             "Claude 4 Opus": AnthropicModel(model_id="claude-opus-4-20250514"),
             "Claude 4.6 Opus": AnthropicModel(model_id="claude-opus-4-6", thinking_budget=16000),
             "Claude 4.1 Opus": AnthropicModel(model_id="claude-opus-4-1-20250805"),
-            "OpenAI O4 Mini (High Reasoning)": OpenAIModel(model_id="o4-mini", reasoning_effort="high"),
-            "OpenAI O3 (High Reasoning)": OpenAIModel(model_id="o3", reasoning_effort="high"),
             "OpenAI O4 Mini (Medium Reasoning)": OpenAIModel(model_id="o4-mini"),
-            "OpenAI O3 (Medium Reasoning)": OpenAIModel(model_id="o3"),
             "GPT-4.1": OpenAIModel(model_id="gpt-4.1"),
             "ChatGPT-4o (Medium Reasoning)": OpenAIModel(model_id="chatgpt-4o-latest"),
-            "ChatGPT-4o (High Reasoning)": OpenAIModel(model_id="chatgpt-4o-latest", reasoning_effort="high"),
             "GPT-4.1 Mini": OpenAIModel(model_id="gpt-4.1-mini"),
             "GPT-4.1 Nano": OpenAIModel(model_id="gpt-4.1-nano"),
             "OpenAI O1": OpenAIModel(model_id="o1"),
@@ -489,13 +484,6 @@ def main():
             # "OpenAI o3-pro": OpenAIModel(model_id="o3-pro"),
             "Claude 3.7 Sonnet": AnthropicModel(model_id="claude-3-7-sonnet-20250219"),
             "Claude 3.5 Haiku": AnthropicModel(model_id="claude-3-5-haiku-20241022"),
-            "Gemini 1.5 Flash": GeminiModel(model_id="gemini-1.5-flash"),
-            "Gemini 1.5 Pro": GeminiModel(model_id="gemini-1.5-pro"),
-            "GPT-5 (high reasoning)": OpenAIModel(model_id="gpt-5-2025-08-07", reasoning_effort="high"),
-            "GPT-5": OpenAIModel(model_id="gpt-5-2025-08-07"),
-            "GPT-5 Mini": OpenAIModel(model_id="gpt-5-mini"),
-            "GPT-5 Nano": OpenAIModel(model_id="gpt-5-nano"),
-            # "GPT-5 Chat": OpenAIModel(model_id="gpt-5-chat"),
             "Gemini 2.0 Flash": GeminiModel(model_id="gemini-2.0-flash"),
             "Gemini 2.0 Flash Lite": GeminiModel(model_id="gemini-2.0-flash-lite"),
             "Gemini 2.5 Flash": GeminiModel(model_id="gemini-2.5-flash"),
@@ -538,6 +526,26 @@ def main():
             ),
             "Arcee.ai Spotlight": CustomOpenAIModel(
                 model_id="arcee-ai/spotlight",
+                base_url="https://openrouter.ai/api/v1",
+                api_key=os.environ.get("OPENROUTER_API_KEY"),
+            ),
+            "GLM 4.6v": CustomOpenAIModel(
+                model_id="z-ai/glm-4.6v",
+                base_url="https://openrouter.ai/api/v1",
+                api_key=os.environ.get("OPENROUTER_API_KEY"),
+            ),
+            "Kimi k2.5": CustomOpenAIModel(
+                model_id="moonshotai/kimi-k2.5",
+                base_url="https://openrouter.ai/api/v1",
+                api_key=os.environ.get("OPENROUTER_API_KEY"),
+            ),
+            "Qwen 3.5 Plus": CustomOpenAIModel(
+                model_id="qwen/qwen3.5-plus-02-15",
+                base_url="https://openrouter.ai/api/v1",
+                api_key=os.environ.get("OPENROUTER_API_KEY"),
+            ),
+            "Qwen 3.5 397B": CustomOpenAIModel(
+                model_id="qwen/qwen3.5-397b-a17b",
                 base_url="https://openrouter.ai/api/v1",
                 api_key=os.environ.get("OPENROUTER_API_KEY"),
             ),
@@ -623,7 +631,7 @@ def main():
         #     if len(images_to_run_by_model[model_name]) > 0
         # ]
 
-        with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
+        with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
             futures = [
                 executor.submit(run_model_with_prompt, model_name, model_class, assessment)
                 for model_name, model_class in models_to_run
@@ -647,6 +655,7 @@ def main():
                 times_by_model[model_name].append(time_taken)
 
                 try:
+                    print('result', result)
                     # try to parse json
                     if isinstance(result, dict):
                         val = result.get("answer", result)
@@ -672,7 +681,7 @@ def main():
                 except Exception as e:
                     # fallback
                     print(f"Failed to parse result for {model_name} on {assessment['file_name']}: {e}")
-                    # print(f"Raw Result: {result}")
+                    print(f"Raw Result: {result}")
                     parsed_answer = str(result)
 
                 # payload["result"] = result 
