@@ -105,7 +105,6 @@ open_or_closed_source = {
     "Gemini 3 Flash": "closed",
     "Gemini 3 Flash (Tools)": "closed",
     "Gemini 2.5 Flash-Lite Preview": "closed",
-    "Gemini 3 Pro Preview": "closed",
     "Cohere Aya Vision 8B": "closed",
     "Cohere Aya Vision 32B": "closed",
     "Qwen 2.5 VL 7B": "open",
@@ -127,6 +126,11 @@ open_or_closed_source = {
     "Kimi k2.5": "open",
     "Qwen 3.5 Plus": "open",
     "Qwen 3.5 397B": "open",
+    "Qwen 3.5 122B (A10B)": "open",
+    "Qwen 3.5 35B (A3B)": "open",
+    "Qwen 3.5 27B": "open",
+    "Gemini 3.1 Pro": "closed",
+    "Gemini 3.1 Pro (Tools)": "closed",
 }
 
 models_in_playground = set([
@@ -142,7 +146,9 @@ models_in_playground = set([
     "GPT-4.1 Nano",
     "ChatGPT-4o",
     "OpenAI O4 Mini",
-    "OpenAI o3-pro"
+    "OpenAI o3-pro",
+    "Gemini 3.1 Pro",
+    "Gemini 3.1 Pro (Tools)"
 ]) 
 
 
@@ -220,12 +226,16 @@ def main():
         "Mistral Small 3.1 24b": "https://mistral.ai/favicon.ico",
         "Mistral Small 3.1 24B": "https://mistral.ai/favicon.ico",
         "Gemma 3 4B": "https://www.google.com/favicon.ico",
-        "Gemini 3 Pro Preview": "https://www.google.com/favicon.ico",
+        "Gemini 3.1 Pro": "https://www.google.com/favicon.ico",
+        "Gemini 3.1 Pro (Tools)": "https://www.google.com/favicon.ico",
         "OpenAI o3-pro": "https://openai.com/favicon.ico",
         "Arcee.ai Spotlight": "https://cdn.prod.website-files.com/6781a10424493fe352bc6cb5/678e92cb5d392e76c953e690_Favicon.png",
         "Phi 4 Multimodal": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/Microsoft_logo.svg/1024px-Microsoft_logo.svg.png?20210729021049",
         "Qwen 3.5 Plus": "https://cdn-avatars.huggingface.co/v1/production/uploads/620760a26e3b7210c2ff1943/-s1gyJfvbE1RgO5iBeNOi.png",
         "Qwen 3.5 397B": "https://cdn-avatars.huggingface.co/v1/production/uploads/620760a26e3b7210c2ff1943/-s1gyJfvbE1RgO5iBeNOi.png",
+        "Qwen 3.5 122B (A10B)": "https://cdn-avatars.huggingface.co/v1/production/uploads/620760a26e3b7210c2ff1943/-s1gyJfvbE1RgO5iBeNOi.png",
+        "Qwen 3.5 35B (A3B)": "https://cdn-avatars.huggingface.co/v1/production/uploads/620760a26e3b7210c2ff1943/-s1gyJfvbE1RgO5iBeNOi.png",
+        "Qwen 3.5 27B": "https://cdn-avatars.huggingface.co/v1/production/uploads/620760a26e3b7210c2ff1943/-s1gyJfvbE1RgO5iBeNOi.png",
         "GLM 4.6v": "/images/z-icon.svg",
         "Kimi k2.5": "/images/kimi-icon.ico",
     }
@@ -410,6 +420,8 @@ def main():
             "Claude 3.7 Sonnet": "",
             "Claude 3.5 Haiku": "",
             "Gemini 2.5 Pro Preview": "",
+            "Gemini 3.1 Pro": "",
+            "Gemini 3.1 Pro (Tools)": "",
             "Gemini 2.0 Flash": "",
             "Gemini 2.0 Flash Lite": "",
             "Gemini 2.5 Flash Preview": "",
@@ -423,6 +435,7 @@ def main():
             "Gemma 3 27b": "",
             "Claude 4 Sonnet": "",
             "Claude 4 Opus": "",
+            "Claude 4.6 Opus": "",
             "Claude 4.1 Opus": "",
             "Mistral Medium 3": "",
             "Gemma 3 1B": "",
@@ -438,6 +451,9 @@ def main():
             "GPT-5 Mini": "",
             "GPT-5 Nano": "",
             "Qwen 3.5 397B": "",
+            "Qwen 3.5 122B (A10B)": "",
+            "Qwen 3.5 35B (A3B)": "",
+            "Qwen 3.5 27B": "",
         }
         
         # assessments = final_results["assessments"] 
@@ -491,7 +507,8 @@ def main():
             "Gemini 2.5 Pro": GeminiModel(model_id="gemini-2.5-pro"),
             "Gemini 3 Flash": GeminiModel(model_id="gemini-3-flash-preview"),
             "Gemini 3 Flash (Tools)": GeminiModel(model_id="gemini-3-flash-preview", enable_code_execution=True),
-            "Gemini 3 Pro Preview": GeminiModel(model_id="gemini-3-pro-preview"),
+            "Gemini 3.1 Pro": GeminiModel(model_id="gemini-3.1-pro-preview"),
+            "Gemini 3.1 Pro (Tools)": GeminiModel(model_id="gemini-3.1-pro-preview", enable_code_execution=True),
             "Cohere Aya Vision 8B": CohereModel(model_id="c4ai-aya-vision-8b"),
             "Cohere Aya Vision 32B": CohereModel(model_id="c4ai-aya-vision-32b"),
             "Qwen 2.5 VL 7B": CustomOpenAIModel(
@@ -549,6 +566,21 @@ def main():
                 base_url="https://openrouter.ai/api/v1",
                 api_key=os.environ.get("OPENROUTER_API_KEY"),
             ),
+            "Qwen 3.5 122B (A10B)": CustomOpenAIModel(
+                model_id="qwen/qwen3.5-122b-a10b",
+                base_url="https://openrouter.ai/api/v1",
+                api_key=os.environ.get("OPENROUTER_API_KEY"),
+            ),
+            "Qwen 3.5 35B (A3B)": CustomOpenAIModel(
+                model_id="qwen/qwen3.5-35b-a3b",
+                base_url="https://openrouter.ai/api/v1",
+                api_key=os.environ.get("OPENROUTER_API_KEY"),
+            ),
+            "Qwen 3.5 27B": CustomOpenAIModel(
+                model_id="qwen/qwen3.5-27b",
+                base_url="https://openrouter.ai/api/v1",
+                api_key=os.environ.get("OPENROUTER_API_KEY"),
+            ),
         }
 
         if is_in_incremental_mode:
@@ -602,6 +634,7 @@ def main():
             ]
 
             print(f"Models to run: {len(models_to_run)}")
+            print("Models to run: ", models_to_run)
 
             images_to_run_by_model = {
                 model_name: set(
@@ -631,7 +664,7 @@ def main():
         #     if len(images_to_run_by_model[model_name]) > 0
         # ]
 
-        with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
+        with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
             futures = [
                 executor.submit(run_model_with_prompt, model_name, model_class, assessment)
                 for model_name, model_class in models_to_run
@@ -783,6 +816,7 @@ def main():
             "percentage": results["percentage"],
             "logo": results["logo"],
             "average_time": results["average_time"],
+            "is_open_source": open_or_closed_source.get(model_name) == "open",
         }
         for model_name, results in model_results.items()
     ]
@@ -868,6 +902,7 @@ def main():
                 "percentage": results["percentage"],
                 "logo": results["logo"],
                 "average_time": results["average_time"],
+                "is_open_source": open_or_closed_source.get(model_name) == "open",
             }
             for model_name, results in category_model_results.items()
         ]
