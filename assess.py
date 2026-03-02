@@ -126,6 +126,9 @@ open_or_closed_source = {
     "Kimi k2.5": "open",
     "Qwen 3.5 Plus": "open",
     "Qwen 3.5 397B": "open",
+    "Qwen 3.5 122B (A10B)": "open",
+    "Qwen 3.5 35B (A3B)": "open",
+    "Qwen 3.5 27B": "open",
     "Gemini 3.1 Pro": "closed",
     "Gemini 3.1 Pro (Tools)": "closed",
 }
@@ -230,6 +233,9 @@ def main():
         "Phi 4 Multimodal": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/Microsoft_logo.svg/1024px-Microsoft_logo.svg.png?20210729021049",
         "Qwen 3.5 Plus": "https://cdn-avatars.huggingface.co/v1/production/uploads/620760a26e3b7210c2ff1943/-s1gyJfvbE1RgO5iBeNOi.png",
         "Qwen 3.5 397B": "https://cdn-avatars.huggingface.co/v1/production/uploads/620760a26e3b7210c2ff1943/-s1gyJfvbE1RgO5iBeNOi.png",
+        "Qwen 3.5 122B (A10B)": "https://cdn-avatars.huggingface.co/v1/production/uploads/620760a26e3b7210c2ff1943/-s1gyJfvbE1RgO5iBeNOi.png",
+        "Qwen 3.5 35B (A3B)": "https://cdn-avatars.huggingface.co/v1/production/uploads/620760a26e3b7210c2ff1943/-s1gyJfvbE1RgO5iBeNOi.png",
+        "Qwen 3.5 27B": "https://cdn-avatars.huggingface.co/v1/production/uploads/620760a26e3b7210c2ff1943/-s1gyJfvbE1RgO5iBeNOi.png",
         "GLM 4.6v": "/images/z-icon.svg",
         "Kimi k2.5": "/images/kimi-icon.ico",
     }
@@ -445,6 +451,9 @@ def main():
             "GPT-5 Mini": "",
             "GPT-5 Nano": "",
             "Qwen 3.5 397B": "",
+            "Qwen 3.5 122B (A10B)": "",
+            "Qwen 3.5 35B (A3B)": "",
+            "Qwen 3.5 27B": "",
         }
         
         # assessments = final_results["assessments"] 
@@ -554,6 +563,21 @@ def main():
             ),
             "Qwen 3.5 397B": CustomOpenAIModel(
                 model_id="qwen/qwen3.5-397b-a17b",
+                base_url="https://openrouter.ai/api/v1",
+                api_key=os.environ.get("OPENROUTER_API_KEY"),
+            ),
+            "Qwen 3.5 122B (A10B)": CustomOpenAIModel(
+                model_id="qwen/qwen3.5-122b-a10b",
+                base_url="https://openrouter.ai/api/v1",
+                api_key=os.environ.get("OPENROUTER_API_KEY"),
+            ),
+            "Qwen 3.5 35B (A3B)": CustomOpenAIModel(
+                model_id="qwen/qwen3.5-35b-a3b",
+                base_url="https://openrouter.ai/api/v1",
+                api_key=os.environ.get("OPENROUTER_API_KEY"),
+            ),
+            "Qwen 3.5 27B": CustomOpenAIModel(
+                model_id="qwen/qwen3.5-27b",
                 base_url="https://openrouter.ai/api/v1",
                 api_key=os.environ.get("OPENROUTER_API_KEY"),
             ),
@@ -792,6 +816,7 @@ def main():
             "percentage": results["percentage"],
             "logo": results["logo"],
             "average_time": results["average_time"],
+            "is_open_source": open_or_closed_source.get(model_name) == "open",
         }
         for model_name, results in model_results.items()
     ]
@@ -877,6 +902,7 @@ def main():
                 "percentage": results["percentage"],
                 "logo": results["logo"],
                 "average_time": results["average_time"],
+                "is_open_source": open_or_closed_source.get(model_name) == "open",
             }
             for model_name, results in category_model_results.items()
         ]
