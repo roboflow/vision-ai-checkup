@@ -26,6 +26,7 @@ class CustomOpenAIModel(Model):
 
         completion = self.client.chat.completions.create(
             model=self.model_id,
+            response_format=structured_output_format,
             messages=[
                 {
                     "role": "user",
