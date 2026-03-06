@@ -62,6 +62,13 @@ def parse_args():
         default=None,
         help="Run only the specified model (partial match allowed).",
     )
+    parser.add_option(
+        "--concurrency",
+        dest="concurrency",
+        type="int",
+        default=1,
+        help="Number of concurrent workers for inference.",
+    )
     options, _ = parser.parse_args()
     return options
 
@@ -79,7 +86,6 @@ if os.path.exists("docs"):
 
 OUTPUT_DIR = "docs"
 BASE_IMAGE_DIR = "images/"
-CONCURRENCY_OVERRIDE_MODELS = ["Llama 3.1"]
 from models.anthropic import AnthropicModel
 from models.cohere import CohereModel
 from models.custom_openai import CustomOpenAIModel
@@ -115,7 +121,7 @@ open_or_closed_source = {
     "Gemma 3 1B": "open",
     "Mistral Small 3.1 24B": "open",
     "Gemma 3 4B": "open",
-    "GPT-5.2": "closed",
+    "GPT-5.4": "closed",
     "Phi 4 Multimodal": "closed",
     "Llama 4 Maverick 17B": "closed",
     "Claude 4 Opus": "closed",
@@ -131,6 +137,9 @@ open_or_closed_source = {
     "Qwen 3.5 27B": "open",
     "Gemini 3.1 Pro": "closed",
     "Gemini 3.1 Pro (Tools)": "closed",
+    "Grok 4": "closed",
+    "Grok 4.1 Fast": "closed",
+    "Molmo2 8B": "open",
 }
 
 models_in_playground = set([
@@ -163,6 +172,8 @@ def main():
         shutil.copy("assets/images/z-icon.svg", os.path.join(OUTPUT_DIR, "images", "z-icon.svg"))
     if os.path.exists("assets/images/kimi-icon.ico"):
         shutil.copy("assets/images/kimi-icon.ico", os.path.join(OUTPUT_DIR, "images", "kimi-icon.ico"))
+    if os.path.exists("assets/images/xai-icon.svg"):
+        shutil.copy("assets/images/xai-icon.svg", os.path.join(OUTPUT_DIR, "images", "xai-icon.svg"))
 
 
 
@@ -190,7 +201,7 @@ def main():
         "Llama 4 Scout 17B": "https://signsalad.com/wp-content/uploads/2021/11/Screenshot-2021-11-03-at-12.14.11.png",
         "GPT-4.1": "https://openai.com/favicon.ico",
         "ChatGPT-4o": "https://openai.com/favicon.ico",
-        "GPT-5.2": "https://openai.com/favicon.ico",
+        "GPT-5.4": "https://openai.com/favicon.ico",
         "GPT-5 Mini": "https://openai.com/favicon.ico",
         "GPT-5 Nano": "https://openai.com/favicon.ico",
         "GPT-5 Chat": "https://openai.com/favicon.ico",
@@ -229,6 +240,9 @@ def main():
         "Gemini 3.1 Pro": "https://www.google.com/favicon.ico",
         "Gemini 3.1 Pro (Tools)": "https://www.google.com/favicon.ico",
         "OpenAI o3-pro": "https://openai.com/favicon.ico",
+        "Molmo2 8B": "https://allenai.org/favicon.ico",
+        "Grok 4": "/images/xai-icon.svg",
+        "Grok 4.1 Fast": "/images/xai-icon.svg",
         "Arcee.ai Spotlight": "https://cdn.prod.website-files.com/6781a10424493fe352bc6cb5/678e92cb5d392e76c953e690_Favicon.png",
         "Phi 4 Multimodal": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/Microsoft_logo.svg/1024px-Microsoft_logo.svg.png?20210729021049",
         "Qwen 3.5 Plus": "https://cdn-avatars.huggingface.co/v1/production/uploads/620760a26e3b7210c2ff1943/-s1gyJfvbE1RgO5iBeNOi.png",
@@ -447,13 +461,16 @@ def main():
             "GLM 4.6v": "",
             "Kimi k2.5": "",
             "Qwen 3.5 Plus": "",
-            "GPT-5.2": "",
+            "GPT-5.4": "",
             "GPT-5 Mini": "",
             "GPT-5 Nano": "",
             "Qwen 3.5 397B": "",
             "Qwen 3.5 122B (A10B)": "",
             "Qwen 3.5 35B (A3B)": "",
             "Qwen 3.5 27B": "",
+            "Molmo2 8B": "",
+            "Grok 4": "",
+            "Grok 4.1 Fast": "",
         }
         
         # assessments = final_results["assessments"] 
@@ -472,7 +489,7 @@ def main():
                 times_by_model[model_name].append(float(assessment["time_taken"].replace("s", "")))
     else:
         model_providers = {
-            "GPT-5.2": OpenAIModel(model_id="gpt-5.2"),
+            "GPT-5.4": OpenAIModel(model_id="gpt-5.4-2026-03-05"),
             "GPT-5 Mini": OpenAIModel(model_id="gpt-5-mini"),
             "GPT-5 Nano": OpenAIModel(model_id="gpt-5-nano"),
             # "GPT-5 Chat": OpenAIModel(model_id="gpt-5-chat"),
@@ -581,6 +598,21 @@ def main():
                 base_url="https://openrouter.ai/api/v1",
                 api_key=os.environ.get("OPENROUTER_API_KEY"),
             ),
+            "Molmo2 8B": CustomOpenAIModel(
+                model_id="allenai/molmo-2-8b",
+                base_url="https://openrouter.ai/api/v1",
+                api_key=os.environ.get("OPENROUTER_API_KEY"),
+            ),
+            "Grok 4": CustomOpenAIModel(
+                model_id="x-ai/grok-4",
+                base_url="https://openrouter.ai/api/v1",
+                api_key=os.environ.get("OPENROUTER_API_KEY"),
+            ),
+            "Grok 4.1 Fast": CustomOpenAIModel(
+                model_id="x-ai/grok-4.1-fast",
+                base_url="https://openrouter.ai/api/v1",
+                api_key=os.environ.get("OPENROUTER_API_KEY"),
+            ),
         }
 
         if is_in_incremental_mode:
@@ -664,7 +696,7 @@ def main():
         #     if len(images_to_run_by_model[model_name]) > 0
         # ]
 
-        with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
+        with concurrent.futures.ThreadPoolExecutor(max_workers=options.concurrency) as executor:
             futures = [
                 executor.submit(run_model_with_prompt, model_name, model_class, assessment)
                 for model_name, model_class in models_to_run
