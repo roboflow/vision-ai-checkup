@@ -95,6 +95,22 @@ from models.openai import OpenAIModel
 # from models.roboflow_workflow import RoboflowWorkflow
 # from utils.data_types import BoundingBoxes
 
+model_weights = {
+    "Qwen 2.5 VL 7B": "7B",
+    "Mistral Medium 3": "73B",
+    "Gemma 3 1B": "1B",
+    "Mistral Small 3.1 24B": "24B",
+    "Gemma 3 4B": "4B",
+    "GLM 4.6v": "106B",
+    "Kimi k2.5": "1T/A32B",
+    "Qwen 3.5 Plus": "397B/A17B",
+    "Qwen 3.5 397B": "397B/A74B",
+    "Qwen 3.5 122B (A10B)": "122B/A10B",
+    "Qwen 3.5 35B (A3B)": "35B/A3B",
+    "Qwen 3.5 27B": "27B",
+    "Molmo2 8B": "8B",
+}
+
 open_or_closed_source = {
     "OpenAI O4 Mini": "closed",
     "GPT-4.1": "closed",
@@ -849,6 +865,7 @@ def main():
             "logo": results["logo"],
             "average_time": results["average_time"],
             "is_open_source": open_or_closed_source.get(model_name) == "open",
+            "weights_size": model_weights.get(model_name, ""),
         }
         for model_name, results in model_results.items()
     ]

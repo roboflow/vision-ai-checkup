@@ -23,10 +23,30 @@
                 </select>
             </div>
 
-        <div class="mb-2 text-sm text-zinc-600">
-            Run on {{ assessment_count }} prompts.
+        <div class="mb-2 text-sm text-zinc-600 flex items-center justify-between">
+            <span>Run on {{ assessment_count }} prompts.</span>
+            <label class="flex items-center gap-1.5 cursor-pointer select-none">
+                <input type="checkbox" id="open-weights-toggle" class="accent-violet-700">
+                <span>Open Weights</span>
+            </label>
         </div>
         <style>
+            .hidden-by-filter {
+                display: none !important;
+            }
+            .instant-tooltip {
+                display: none;
+                position: fixed;
+                background: #1f2937;
+                color: #fff;
+                font-size: 0.7rem;
+                font-weight: 400;
+                padding: 4px 8px;
+                border-radius: 4px;
+                white-space: nowrap;
+                pointer-events: none;
+                z-index: 9999;
+            }
             #score-option, #time-option {
                 cursor: pointer;
                 display: flex;
@@ -42,11 +62,12 @@
                 <div class="flex-1" style="align-content: center;">Model</div>
                 <div class="w-14 text-center" id="score-option">Score <div class="score-arrow"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="#000000" viewBox="0 0 256 256"><path d="M205.66,149.66l-72,72a8,8,0,0,1-11.32,0l-72-72a8,8,0,0,1,11.32-11.32L120,196.69V40a8,8,0,0,1,16,0V196.69l58.34-58.35a8,8,0,0,1,11.32,11.32Z"></path></svg></div></div>
                 <div class="w-32 text-center" title="Average Model Response Time per Prompt" id="time-option">Avg Time / Prompt <div class="time-arrow"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="#000000" viewBox="0 0 256 256"><path d="M205.66,149.66l-72,72a8,8,0,0,1-11.32,0l-72-72a8,8,0,0,1,11.32-11.32L120,196.69V40a8,8,0,0,1,16,0V196.69l58.34-58.35a8,8,0,0,1,11.32,11.32Z"></path></svg></div></div>
+                <div class="w-24 text-center weights-col" style="display:none;">Weights Size</div>
             </div>
             <div class="rows">
             {% for model in model_results %}
-                <a role="row" class="model-row {% if loop.index > 10 %}hidden{% endif %}" href="/{{ model["model_name"].replace(' ', '-').lower().replace('.', '-').replace('(', '-').replace(')', '-') }}/">
-                    <div class="flex flex-nowrap items-center flex-1 gap-1 whitespace-nowrap text-violet-700">#{{ model["position"] }} <img src="{{ model['logo'] }}" class="w-4 h-4"> {{ model["model_name"] }} {% if model["model_name"] in new_models %}<span class="new" style="color: white;padding-left: 0.5rem;padding-right: 0.5rem;background: rgb(109 40 217/var(--tw-text-opacity,1));border-radius: 0.875rem;margin-left: 0.25rem;font-size: 0.7rem;" id="model-{{ model['model_name'] }}-new">
+                <a role="row" class="model-row {% if loop.index > 10 %}hidden{% endif %}" data-open-source="{{ model['is_open_source'] | lower }}" href="/{{ model["model_name"].replace(' ', '-').lower().replace('.', '-').replace('(', '-').replace(')', '-') }}/">
+                    <div class="flex flex-nowrap items-center flex-1 gap-1 whitespace-nowrap text-violet-700">#{{ model["position"] }} <img src="{{ model['logo'] }}" class="w-4 h-4"> {{ model["model_name"] }} {% if model["is_open_source"] %}<span class="open-weights-icon" style="display:inline-flex;color:#9ca3af;margin-left:2px;position:relative;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 32 32"><path d="M15.5 1.125C7.278 1.125.59 7.815.59 16.035c0 6.263 3.88 11.635 9.36 13.84l3.64-9.076a5.131 5.131 0 1 1 3.818-.001l3.64 9.075c5.48-2.206 9.36-7.578 9.36-13.84c.002-8.22-6.687-14.91-14.908-14.91z"></path></svg><span class="instant-tooltip">Open weights model</span></span>{% endif %}{% if model["model_name"] in new_models %}<span class="new" style="color: white;padding-left: 0.5rem;padding-right: 0.5rem;background: rgb(109 40 217/var(--tw-text-opacity,1));border-radius: 0.875rem;margin-left: 0.25rem;font-size: 0.7rem;" id="model-{{ model['model_name'] }}-new">
                         New</span>{% endif %}</div>
                         <span id="model-{{ model['model_name'] }}-date" class="date"></span>
                         {% if model["model_name"] in new_models %}
@@ -66,6 +87,7 @@
                         {{ model["average_time"] }}
                         {% endif %}
                     </div>
+                    <div class="w-24 text-center weights-col weights-cell" style="display:none;position:relative;">{{ model["weights_size"] }}<span class="instant-tooltip">{% if '/' in model['weights_size'] %}Total / Active parameters (MoE){% else %}Total parameters{% endif %}</span></div>
                 </a>
             {% endfor %}
             </div>
@@ -206,6 +228,38 @@
             }
         });
         const btn = document.getElementById('toggle-more-btn');
+
+        const openWeightsToggle = document.getElementById('open-weights-toggle');
+        openWeightsToggle.addEventListener('change', function() {
+            const rows = document.querySelectorAll('.model-row');
+            const weightsCols = document.querySelectorAll('.weights-col');
+            const isChecked = this.checked;
+            rows.forEach(row => {
+                if (isChecked && row.dataset.openSource !== 'true') {
+                    row.classList.add('hidden-by-filter');
+                } else {
+                    row.classList.remove('hidden-by-filter');
+                }
+                // expand all rows when filtering
+                if (isChecked) {
+                    row.classList.remove('hidden');
+                }
+            });
+            // show/hide weights column
+            weightsCols.forEach(col => {
+                col.style.display = isChecked ? '' : 'none';
+            });
+            // update show more/fewer button
+            if (isChecked) {
+                btn.textContent = 'Show fewer models';
+            } else {
+                // restore default collapsed state
+                rows.forEach((row, i) => {
+                    if (i >= 10) row.classList.add('hidden');
+                });
+                btn.textContent = 'Show more models';
+            }
+        });
         if (btn) {
             btn.onclick = function toggleMore() {
                 const hiddenRows = document.querySelectorAll('.model-row.hidden');
@@ -216,5 +270,24 @@
                 btn.textContent = isHidden ? 'Show fewer models' : 'Show more models';
             };
         }
+        const globalTip = document.createElement('div');
+        globalTip.className = 'instant-tooltip';
+        document.body.appendChild(globalTip);
+
+        document.addEventListener('mouseover', function(e) {
+            const trigger = e.target.closest('.open-weights-icon, .weights-cell');
+            if (!trigger) { globalTip.style.display = 'none'; return; }
+            const localTip = trigger.querySelector('.instant-tooltip');
+            if (!localTip) { globalTip.style.display = 'none'; return; }
+            globalTip.textContent = localTip.textContent;
+            globalTip.style.display = 'block';
+            const rect = trigger.getBoundingClientRect();
+            globalTip.style.left = (rect.left + rect.width / 2 - globalTip.offsetWidth / 2) + 'px';
+            globalTip.style.top = (rect.top - globalTip.offsetHeight - 4) + 'px';
+        });
+        document.addEventListener('mouseout', function(e) {
+            const trigger = e.target.closest('.open-weights-icon, .weights-cell');
+            if (trigger) globalTip.style.display = 'none';
+        });
     </script>
 {% endblock %}
