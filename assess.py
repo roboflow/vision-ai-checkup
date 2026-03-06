@@ -89,6 +89,7 @@ BASE_IMAGE_DIR = "images/"
 from models.anthropic import AnthropicModel
 from models.cohere import CohereModel
 from models.custom_openai import CustomOpenAIModel
+from models.ollama import OllamaModel
 from models.gemini import GeminiModel
 from models.openai import OpenAIModel
 # from models.open_router import OpenRouterModel
@@ -109,6 +110,12 @@ model_weights = {
     "Qwen 3.5 35B (A3B)": "35B/A3B",
     "Qwen 3.5 27B": "27B",
     "Molmo2 8B": "8B",
+    "Qwen 3.5 0.8B": "0.8B",
+    "Qwen 3.5 2B": "2B",
+    "Qwen 3.5 4B": "4B",
+    "Qwen 3.5 9B": "9B",
+    "Cosmos Reason2 2B": "2B",
+    "Cosmos Reason2 8B": "8B",
 }
 
 open_or_closed_source = {
@@ -156,6 +163,12 @@ open_or_closed_source = {
     "Grok 4": "closed",
     "Grok 4.1 Fast": "closed",
     "Molmo2 8B": "open",
+    "Qwen 3.5 0.8B": "open",
+    "Qwen 3.5 2B": "open",
+    "Qwen 3.5 4B": "open",
+    "Qwen 3.5 9B": "open",
+    "Cosmos Reason2 2B": "open",
+    "Cosmos Reason2 8B": "open",
 }
 
 models_in_playground = set([
@@ -268,6 +281,12 @@ def main():
         "Qwen 3.5 27B": "https://cdn-avatars.huggingface.co/v1/production/uploads/620760a26e3b7210c2ff1943/-s1gyJfvbE1RgO5iBeNOi.png",
         "GLM 4.6v": "/images/z-icon.svg",
         "Kimi k2.5": "/images/kimi-icon.ico",
+        "Qwen 3.5 0.8B": "https://cdn-avatars.huggingface.co/v1/production/uploads/620760a26e3b7210c2ff1943/-s1gyJfvbE1RgO5iBeNOi.png",
+        "Qwen 3.5 2B": "https://cdn-avatars.huggingface.co/v1/production/uploads/620760a26e3b7210c2ff1943/-s1gyJfvbE1RgO5iBeNOi.png",
+        "Qwen 3.5 4B": "https://cdn-avatars.huggingface.co/v1/production/uploads/620760a26e3b7210c2ff1943/-s1gyJfvbE1RgO5iBeNOi.png",
+        "Qwen 3.5 9B": "https://cdn-avatars.huggingface.co/v1/production/uploads/620760a26e3b7210c2ff1943/-s1gyJfvbE1RgO5iBeNOi.png",
+        "Cosmos Reason2 2B": "https://www.nvidia.com/favicon.ico",
+        "Cosmos Reason2 8B": "https://www.nvidia.com/favicon.ico",
     }
 
 
@@ -487,6 +506,12 @@ def main():
             "Molmo2 8B": "",
             "Grok 4": "",
             "Grok 4.1 Fast": "",
+            "Qwen 3.5 0.8B": "",
+            "Qwen 3.5 2B": "",
+            "Qwen 3.5 4B": "",
+            "Qwen 3.5 9B": "",
+            "Cosmos Reason2 2B": "",
+            "Cosmos Reason2 8B": "",
         }
         
         # assessments = final_results["assessments"] 
@@ -628,6 +653,32 @@ def main():
                 model_id="x-ai/grok-4.1-fast",
                 base_url="https://openrouter.ai/api/v1",
                 api_key=os.environ.get("OPENROUTER_API_KEY"),
+            ),
+            "Qwen 3.5 0.8B": OllamaModel(
+                model_id="qwen3.5:0.8b",
+                base_url=os.environ.get("OLLAMA_BASE_URL", "http://localhost:11434"),
+            ),
+            "Qwen 3.5 2B": OllamaModel(
+                model_id="qwen3.5:2b",
+                base_url=os.environ.get("OLLAMA_BASE_URL", "http://localhost:11434"),
+            ),
+            "Qwen 3.5 4B": OllamaModel(
+                model_id="qwen3.5:4b",
+                base_url=os.environ.get("OLLAMA_BASE_URL", "http://localhost:11434"),
+            ),
+            "Qwen 3.5 9B": OllamaModel(
+                model_id="qwen3.5:9b",
+                base_url=os.environ.get("OLLAMA_BASE_URL", "http://localhost:11434"),
+            ),
+            "Cosmos Reason2 2B": CustomOpenAIModel(
+                model_id="nvidia/Cosmos-Reason2-2B",
+                base_url=os.environ.get("VLLM_BASE_URL", "http://localhost:8000") + "/v1",
+                api_key="no-auth",
+            ),
+            "Cosmos Reason2 8B": CustomOpenAIModel(
+                model_id="nvidia/Cosmos-Reason2-8B",
+                base_url=os.environ.get("VLLM_BASE_URL", "http://localhost:8000") + "/v1",
+                api_key="no-auth",
             ),
         }
 

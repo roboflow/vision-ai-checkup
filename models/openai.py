@@ -5,7 +5,7 @@ from openai import BadRequestError, OpenAI
 from .model import Model
 
 OPENAI_TEMPERATURE = 0.1
-SKIP_TEMPERATURE = ["gpt-5-2025-08-07", "gpt-5.1", "gpt-5.2", "o4-mini", "chatgpt-4o-latest", "o3", "o1", "o3-pro", "o4-mini-high", "gpt-5-mini", "gpt-5-nano", "gpt-5-chat", "gpt-5"]
+SKIP_TEMPERATURE = ["gpt-5-2025-08-07", "gpt-5.1", "gpt-5.2", "gpt-5.4-2026-03-05", "o4-mini", "chatgpt-4o-latest", "o3", "o1", "o3-pro", "o4-mini-high", "gpt-5-mini", "gpt-5-nano", "gpt-5-chat", "gpt-5"]
 
 
 class OpenAIModel(Model):
@@ -146,6 +146,9 @@ class OpenAIModel(Model):
                     )
                 
                 print(f"Error parsing structured output: {e}")
+                pass
+            except AttributeError:
+                # Fallback if beta client is not available
                 pass
 
         # if reasoning_effort != "medium":
