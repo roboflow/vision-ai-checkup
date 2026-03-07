@@ -292,7 +292,7 @@ def build_site(assessments, assessments_by_model, times_by_model, model_provider
                 card_template.render(
                     model_description=([model_info_item["description"] for model_info_item in model_info if model_info_item["model_name"] == model_name] + [""])[0],
                     model_name=model_name,
-                    model_in_playground=MODEL_REGISTRY.get(model_name, {}).get("in_playground", False),
+                    playground_slug=MODEL_REGISTRY.get(model_name, {}).get("playground_slug", ""),
                     grid=True,
                     comparisons=[{"slug": f"/compare/{slugify(m1)}-vs-{slugify(m2)}/", "model_name": m2 if m1 == model_name else m1} for m1, m2 in model_combinations if m1 == model_name or m2 == model_name],
                     all_models=list(model_providers.keys()),

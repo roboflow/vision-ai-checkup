@@ -33,9 +33,6 @@
                             {{ model_description }}
                         </div>
                     {% endif %}
-                    {% if model_in_playground %}
-                        <a class="btn-primary" href="https://playground.roboflow.com" style="grid-column: span 2;text-align: center;align-content: center; justify-content: space-between;"><div>Test {{ model_name }} in our Model Playground</div><svg style="height: 1rem;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256"><rect width="256" height="256" fill="none"/><polygon points="160 16 144 96 208 120 96 240 112 160 48 136 160 16" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="16"/></svg></a>
-                    {% endif %}
                 </div>
             </section>
 
@@ -100,7 +97,15 @@
     </div>
 
     <aside id="prompts" class="pb-12 md:pt-12">
-        <h2 id="prompts-heading" class="h2 mb-3 md:mt-[60px]">All Prompts</h2>
+        <div class="flex items-center justify-between mb-3 md:mt-[60px]">
+            <h2 id="prompts-heading" class="h2">All Prompts</h2>
+            {% if playground_slug %}
+                <a href="https://playground.roboflow.com/models/{{ playground_slug }}" target="_blank" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 transition-colors whitespace-nowrap">
+                    <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="none"><polygon points="160 16 144 96 208 120 96 240 112 160 48 136 160 16" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="24"/></svg>
+                    Try in Playground
+                </a>
+            {% endif %}
+        </div>
         <div class="flex flex-col gap-2">
             {% for assessment in results %}
                 <details class="card !p-0 cursor-pointer group" {% if loop.index == 1 %}open{% endif %} data-category="{{ assessment['category'] }}">
