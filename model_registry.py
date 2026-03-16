@@ -588,6 +588,19 @@ MODEL_REGISTRY = {
             base_url=os.environ.get("SMOLVLM_BASE_URL", "http://localhost:5000"),
         ),
     },
+    # --- Reka ---
+    "Reka Edge": {
+        "open_weights": True,
+        "weights_size": "7B",
+        "logo": "https://framerusercontent.com/images/XekAjHcWv2prUE9pJiSj61CD54.jpg",
+        "playground_slug": "",
+        "provider": lambda: CustomOpenAIModel(
+            model_id="reka-edge-2603",
+            base_url="https://api.reka.ai/v1",
+            api_key=os.environ.get("REKA_KEY"),
+            supports_response_format=False,
+        ),
+    },
     # --- Arcee ---
     "Arcee.ai Spotlight": {
         "open_weights": False,
