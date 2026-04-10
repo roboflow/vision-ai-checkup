@@ -3,7 +3,6 @@ import os
 from models.anthropic import AnthropicModel
 from models.cohere import CohereModel
 from models.custom_openai import CustomOpenAIModel
-from models.glm_ocr import GLMOCRModel
 from models.liquid import LiquidVLModel
 from models.ollama import OllamaModel
 from models.gemini import GeminiModel
@@ -557,15 +556,6 @@ MODEL_REGISTRY = {
         ),
     },
     # --- GLM / Kimi ---
-    "GLM OCR": {
-        "open_weights": True,
-        "weights_size": "0.9B",
-        "logo": "/images/z-icon.svg",
-        "playground_slug": "",
-        "provider": lambda: GLMOCRModel(
-            api_key=os.environ.get("ZAI_KEY", ""),
-        ),
-    },
     "GLM 4.6v": {
         "open_weights": True,
         "weights_size": "106B",
