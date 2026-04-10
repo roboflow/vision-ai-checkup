@@ -3,6 +3,8 @@ import os
 from models.anthropic import AnthropicModel
 from models.cohere import CohereModel
 from models.custom_openai import CustomOpenAIModel
+from models.glm_ocr import GLMOCRModel
+from models.liquid import LiquidVLModel
 from models.ollama import OllamaModel
 from models.gemini import GeminiModel
 from models.openai import OpenAIModel
@@ -17,6 +19,7 @@ MISTRAL_LOGO = "https://mistral.ai/favicon.ico"
 META_LOGO = "https://signsalad.com/wp-content/uploads/2021/11/Screenshot-2021-11-03-at-12.14.11.png"
 COHERE_LOGO = "https://cohere.com/favicon.ico"
 NVIDIA_LOGO = "https://www.nvidia.com/favicon.ico"
+LIQUID_LOGO = "https://cdn.prod.website-files.com/67cb8aa6e9184b6e44813162/67cb8aa6e9184b6e448131f6_Favicon.png"
 
 MODEL_REGISTRY = {
     # --- OpenAI ---
@@ -303,6 +306,28 @@ MODEL_REGISTRY = {
         "playground_slug": "",
         "provider": None,
     },
+    "Gemma 4 26B (A4B)": {
+        "open_weights": True,
+        "weights_size": "26B/A4B",
+        "logo": GOOGLE_LOGO,
+        "playground_slug": "",
+        "provider": lambda: CustomOpenAIModel(
+            model_id="google/gemma-4-26b-a4b-it",
+            base_url="https://openrouter.ai/api/v1",
+            api_key=os.environ.get("OPENROUTER_API_KEY"),
+        ),
+    },
+    "Gemma 4 31B": {
+        "open_weights": True,
+        "weights_size": "31B",
+        "logo": GOOGLE_LOGO,
+        "playground_slug": "",
+        "provider": lambda: CustomOpenAIModel(
+            model_id="google/gemma-4-31b-it",
+            base_url="https://openrouter.ai/api/v1",
+            api_key=os.environ.get("OPENROUTER_API_KEY"),
+        ),
+    },
     # --- Meta ---
     "Llama 3 11B Vision": {
         "open_weights": True,
@@ -388,6 +413,17 @@ MODEL_REGISTRY = {
             model_id="Qwen/Qwen2.5-VL-7B-Instruct:hyperbolic",
             base_url="https://router.huggingface.co/v1",
             api_key=os.environ.get("HUGGINGFACE_API_KEY"),
+        ),
+    },
+    "Qwen 3.6 Plus": {
+        "open_weights": False,
+        "weights_size": "",
+        "logo": QWEN_LOGO,
+        "playground_slug": "",
+        "provider": lambda: CustomOpenAIModel(
+            model_id="qwen/qwen3.6-plus",
+            base_url="https://openrouter.ai/api/v1",
+            api_key=os.environ.get("OPENROUTER_API_KEY"),
         ),
     },
     "Qwen 3.5 Plus": {
@@ -489,7 +525,7 @@ MODEL_REGISTRY = {
     "Phi 4 Multimodal": {
         "open_weights": True,
         "weights_size": "5.6B",
-        "logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/Microsoft_logo.svg/1024px-Microsoft_logo.svg.png?20210729021049",
+        "logo": "https://www.microsoft.com/favicon.ico?v2",
         "playground_slug": "",
         "provider": lambda: CustomOpenAIModel(
             model_id="microsoft/phi-4-multimodal-instruct",
@@ -521,6 +557,15 @@ MODEL_REGISTRY = {
         ),
     },
     # --- GLM / Kimi ---
+    "GLM OCR": {
+        "open_weights": True,
+        "weights_size": "0.9B",
+        "logo": "/images/z-icon.svg",
+        "playground_slug": "",
+        "provider": lambda: GLMOCRModel(
+            api_key=os.environ.get("ZAI_KEY", ""),
+        ),
+    },
     "GLM 4.6v": {
         "open_weights": True,
         "weights_size": "106B",
@@ -600,6 +645,21 @@ MODEL_REGISTRY = {
             api_key=os.environ.get("REKA_KEY"),
             supports_response_format=False,
         ),
+    },
+    # --- Liquid ---
+    "LFM 2 24B (A2B)": {
+        "open_weights": True,
+        "weights_size": "24B/A2B",
+        "logo": LIQUID_LOGO,
+        "playground_slug": "",
+        "provider": None,
+    },
+    "LFM 2.5 VL 1.6B": {
+        "open_weights": True,
+        "weights_size": "1.6B",
+        "logo": LIQUID_LOGO,
+        "playground_slug": "",
+        "provider": lambda: LiquidVLModel(model_id="LiquidAI/LFM2.5-VL-1.6B"),
     },
     # --- Arcee ---
     "Arcee.ai Spotlight": {
