@@ -1,8 +1,4 @@
-import base64
 import io
-
-from PIL import Image
-from transformers import AutoModelForImageTextToText, AutoProcessor
 
 from .model import Model
 
@@ -15,6 +11,8 @@ class LiquidVLModel(Model):
 
     def _load(self):
         if self._model is None:
+            from transformers import AutoModelForImageTextToText, AutoProcessor
+
             self._model = AutoModelForImageTextToText.from_pretrained(
                 self.model_id,
                 device_map="auto",
@@ -28,6 +26,8 @@ class LiquidVLModel(Model):
         structured_output_format=None,
         image_name: str = "image.png",
     ):
+        from PIL import Image
+
         self._load()
 
         pil_image = Image.open(io.BytesIO(image)).convert("RGB")
@@ -51,7 +51,6 @@ class LiquidVLModel(Model):
         ).to(self._model.device)
 
         outputs = self._model.generate(**inputs, max_new_tokens=1024)
-        # Decode only the new tokens (skip the input)
         new_tokens = outputs[0][inputs["input_ids"].shape[1]:]
         result = self._processor.decode(new_tokens, skip_special_tokens=True)
 
