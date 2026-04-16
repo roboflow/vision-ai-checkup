@@ -177,6 +177,13 @@ MODEL_REGISTRY = {
         "playground_slug": "anthropic/claude-4-1-opus",
         "provider": lambda: AnthropicModel(model_id="claude-opus-4-1-20250805"),
     },
+    "Claude 4.7 Opus": {
+        "open_weights": False,
+        "weights_size": "",
+        "logo": ANTHROPIC_LOGO,
+        "playground_slug": "anthropic/claude-opus-4-7",
+        "provider": lambda: AnthropicModel(model_id="claude-opus-4-7", adaptive_thinking=True),
+    },
     # --- Google ---
     "Gemini 2.5 Pro Preview": {
         "open_weights": False,

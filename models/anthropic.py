@@ -6,11 +6,12 @@ ANTHROPIC_TEMPERATURE = 0.1
 
 
 class AnthropicModel(Model):
-    def __init__(self, model_id: str, thinking_budget: int = 0):
+    def __init__(self, model_id: str, thinking_budget: int = 0, adaptive_thinking: bool = False):
         self.model_id = model_id
         self.thinking_budget = thinking_budget
+        self.adaptive_thinking = adaptive_thinking
         # Increase timeout significantly for extended thinking
-        self.client = anthropic.Anthropic(timeout=None if thinking_budget > 0 else 60.0)
+        self.client = anthropic.Anthropic(timeout=None if (thinking_budget > 0 or adaptive_thinking) else 60.0)
 
     def run(
         self,
@@ -45,7 +46,11 @@ class AnthropicModel(Model):
             ],
         }
 
-        if self.thinking_budget > 0:
+        if self.adaptive_thinking:
+            kwargs["thinking"] = {"type": "adaptive"}
+            kwargs.pop("temperature", None)
+            kwargs["max_tokens"] = 16000
+        elif self.thinking_budget > 0:
             kwargs["thinking"] = {"type": "enabled", "budget_tokens": self.thinking_budget}
             kwargs["temperature"] = 1.0
             # Ensure max_tokens is greater than thinking budget
