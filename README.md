@@ -1,5 +1,10 @@
 # Vision AI Checkup
 
+> **Vision Checkup has graduated into [Roboflow Playground](https://playground.roboflow.com/evals).**
+> The evaluations, models, and task categories live on — now alongside a much larger set of vision tools, side-by-side comparisons, and leaderboards. Head to [playground.roboflow.com/evals](https://playground.roboflow.com/evals) to continue exploring.
+>
+> This repository is archived for historical reference. The hosted site at [visioncheckup.com](https://visioncheckup.com) now redirects to the corresponding model and task pages on Playground.
+
 ![](./images/screenshot.png)
 
 [Vision AI Checkup](https://visioncheckup.com) is a tool to evaluate vision-capable language models on real-world problems.
