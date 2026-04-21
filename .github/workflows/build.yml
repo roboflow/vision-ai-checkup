@@ -37,6 +37,9 @@ jobs:
         run: |
           npm install
           npm run prod
+      - name: Generate redirect pages
+        run: |
+          python build_redirects.py
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
